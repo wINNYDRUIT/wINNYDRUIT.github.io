@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grzesiu APPs</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* Smooth scroll */
+html{
+scroll-behavior:smooth;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Inter',sans-serif;
+}
+
+/* Body i dynamiczne tło z gradientem i efektem kursora */
+body{
+color:#ffffff;
+background: linear-gradient(-45deg, #8b0000, #ff4500, #ff6347, #b22222);
+background-size:400% 400%;
+transition: background-position 0.05s ease-out;
+min-height: 100vh;
+}
+
+/* Nagłówek */
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:20px 10%;
+backdrop-filter:blur(8px);
+background: rgba(0, 0, 0, 0.3);
+position: fixed;
+width: 100%;
+top: 0;
+z-index: 100;
+animation: slideDown 0.6s ease-out;
+}
+
+.logo{
+font-size:22px;
+font-weight:700;
+background: linear-gradient(45deg, #ff6b35, #ffb347);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+}
+
+nav a{
+margin-left:25px;
+text-decoration:none;
+color:#d0a080;
+transition:0.3s;
+cursor: pointer;
+padding: 5px 10px;
+border-radius: 5px;
+}
+
+nav a:hover, nav a.active{
+color: #ff6b35;
+opacity:1;
+background: rgba(255, 107, 53, 0.15);
+}
+
+/* Hero */
+.hero{
+height:100vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+padding:20px;
+margin-top: 60px;
+animation: fadeInUp 0.8s ease-out;
+}
+
+.hero h1{
+font-size:60px;
+margin-bottom:15px;
+color: #ffffff;
+font-weight: 900;
+letter-spacing: 2px;
+animation: scaleIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+text-shadow: 0 0 30px rgba(255, 107, 53, 0.8), 0 0 60px rgba(255, 69, 0, 0.6);
+}
+
+.hero p{
+max-width:600px;
+margin-bottom:30px;
+opacity:1;
+font-size: 1.2rem;
+color: #ffffff;
+animation: fadeInUp 0.8s ease-out 0.2s both;
+text-shadow: 0 0 20px rgba(255, 107, 53, 0.7);
+}
+
+/* Przycisk */
+.btn{
+background:#ff4500;
+padding:16px 40px;
+border-radius:50px;
+text-decoration:none;
+color:white;
+font-weight:600;
+transition:all 0.3s ease;
+position:relative;
+z-index:2;
+margin-top:10px;
+display:inline-block;
+border: none;
+cursor: pointer;
+box-shadow: 0 0 25px rgba(255, 69, 0, 0.6), 0 0 40px rgba(255, 69, 0, 0.3);
+animation: fadeInUp 0.8s ease-out 0.4s both;
+}
+
+.btn:hover{
+transform:scale(1.12);
+background: #ff5c1a;
+box-shadow: 
+0 0 50px rgba(255, 69, 0, 1),
+0 0 100px rgba(255, 69, 0, 0.6),
+0 0 25px rgba(255, 179, 71, 0.8);
+filter: brightness(1.15);
+}
+
+.btn:active{
+transform: scale(1.05);
+}
+
+/* Sekcja projektu */
+.section{
+padding:100px 10%;
+position: relative;
+z-index: 2;
+}
+
+.section h2{
+text-align:center;
+margin-bottom:60px;
+font-size:44px;
+background: linear-gradient(45deg, #ff6b35, #ffb347);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+font-weight: 900;
+letter-spacing: 1px;
+animation: fadeInUp 0.6s ease-out;
+}
+
+.projects{
+display:grid;
+grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+gap:40px;
+justify-items:center;
+max-width: 1200px;
+margin: 0 auto;
+}
+
+.project{
+background:rgba(0,0,0,0.4);
+padding:40px;
+border-radius:15px;
+backdrop-filter:blur(10px);
+border: 2px solid rgba(255, 107, 53, 0.3);
+transition:all 0.5s ease;
+opacity:0;
+transform:translateY(40px);
+text-align:center;
+will-change: transform, box-shadow;
+backface-visibility: hidden;
+}
+
+.projects .project:nth-child(1) { animation-delay: 0.1s; }
+.projects .project:nth-child(2) { animation-delay: 0.2s; }
+.projects .project:nth-child(3) { animation-delay: 0.3s; }
+
+.project h3{
+font-size: 1.8rem;
+color: #ff6b35;
+margin-bottom: 15px;
+font-weight: 700;
+}
+
+.project p{
+color: #d0a080;
+line-height: 1.7;
+margin-bottom: 20px;
+font-size: 0.95rem;
+}
+
+.project:hover{
+transform:translateY(-12px) scale(1.03);
+background: rgba(255, 107, 53, 0.15);
+border-color: rgba(255, 179, 71, 0.8);
+box-shadow: 
+0 15px 50px rgba(255, 107, 53, 0.5), 
+inset 0 0 20px rgba(255, 107, 53, 0.2), 
+0 0 30px rgba(255, 179, 71, 0.4);
+}
+
+/* Footer */
+footer{
+margin-top:80px;
+padding:40px 10%;
+text-align:center;
+opacity:0.8;
+border-top: 1px solid rgba(255, 107, 53, 0.2);
+background: rgba(0, 0, 0, 0.3);
+position: relative;
+z-index: 2;
+}
+
+/* Animacje */
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.7);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+<div class="logo">⚡ Grzesiu APPs</div>
+<nav>
+<a href="#home" class="nav-link active">Home</a>
+<a href="#projekty" class="nav-link">Projekty</a>
+<a href="#kontakt" class="nav-link">Kontakt</a>
+</nav>
+</header>
+
+<section class="hero" id="home">
+<h1>Grzesiu Apps</h1>
+<p>Odkrywaj moje projekty i aplikacje</p>
+<a class="btn" href="#projekty">Przejdź do Projektów</a>
+</section>
+
+<section class="section" id="projekty">
+<h2>Moje Projekty</h2>
+<div class="projects">
+<div class="project">
+<h3>🚀 Projekt 1</h3>
+<p>Opis twojego pierwszego projektu. Tutaj możesz dodać szczegóły o tym, co robisz i jakie technologie używasz.</p>
+<a class="btn" href="#">Dowiedz się więcej</a>
+</div>
+<div class="project">
+<h3>💡 Projekt 2</h3>
+<p>Opis twojego drugiego projektu. Pokaż swoją kreatywność i umiejętności w praktyce.</p>
+<a class="btn" href="#">Dowiedz się więcej</a>
+</div>
+<div class="project">
+<h3>⭐ Projekt 3</h3>
+<p>Opis twojego trzeciego projektu. Dodaj więcej projektów jeśli chcesz i rozwijaj swoją ofertę!</p>
+<a class="btn" href="#">Dowiedz się więcej</a>
+</div>
+</div>
+</section>
+
+<footer id="kontakt">
+© 2026 Grzesiu APPs - Wszystkie prawa zastrzeżone
+</footer>
+
+<script>
+/* Animacja pojawiania projektów na scroll */
+const projectElements = document.querySelectorAll(".project");
+
+function showProjects(){
+  projectElements.forEach(el => {
+    const position = el.getBoundingClientRect().top;
+    const screenPosition = window.innerHeight / 1.2;
+    if(position < screenPosition){
+      el.style.opacity = "1";
+      el.style.transform = "translateY(0)";
+    }
+  });
+}
+
+window.addEventListener("scroll", showProjects);
+showProjects();
+
+/* Gradient reagujący na ruch kursora - KOLOROWE */
+document.addEventListener("mousemove", e => {
+  const xPercent = (e.clientX / window.innerWidth) * 100;
+  const yPercent = (e.clientY / window.innerHeight) * 100;
+  document.body.style.backgroundPosition = `${xPercent}% ${yPercent}%`;
+});
+
+/* Nawigacja - zaznaczanie aktywnego linku */
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', function(e) {
+    e.preventDefault();
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    this.classList.add('active');
+    const targetId = this.getAttribute('href');
+    document.querySelector(targetId).scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+/* Smooth scroll na przyciskach */
+document.querySelectorAll('a[href^="#"]').forEach(link => {
+  link.addEventListener('click', function(e) {
+    const targetId = this.getAttribute('href');
+    if(targetId && targetId !== '#') {
+      e.preventDefault();
+      const target = document.querySelector(targetId);
+      if(target) {
+        target.scrollIntoView({ behavior: 'smooth' });
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        const activeLink = document.querySelector(`a[href="${targetId}"]`);
+        if(activeLink && activeLink.classList.contains('nav-link')) {
+          activeLink.classList.add('active');
+        }
+      }
+    }
+  });
+});
+</script>
+
+</body>
+</html>
