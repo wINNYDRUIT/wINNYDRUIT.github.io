@@ -448,7 +448,7 @@ Demo: login: <strong>admin</strong> | hasło: <strong>admin123</strong>
 <!-- ADMIN PANEL -->
 <div class="admin-container" id="adminContainer">
 <header>
-<div class="logo-admin">⚡ Admin Panel - Grzesiu APPs</div>
+<a class="logo-admin" href="index.html">⚡ Admin Panel - Grzesiu APPs</a>
 <button class="logout-btn" onclick="logout()">Wyloguj się</button>
 </header>
 
@@ -493,6 +493,37 @@ Demo: login: <strong>admin</strong> | hasło: <strong>admin123</strong>
 <div class="empty-state">Brak projektów. Dodaj swój pierwszy projekt!</div>
 </div>
 
+<!-- SCRIPTS SECTION -->
+<div class="section-title">💻 Zarządzanie Skryptami</div>
+<div class="add-project-form" style="padding-top: 20px;">
+<div class="success-msg" id="scriptSuccessMsg"></div>
+
+<div class="form-row">
+<div class="form-group-admin">
+<label>Nazwa skryptu:</label>
+<input type="text" id="scriptName" placeholder="np. Auto-fill form">
+</div>
+<div class="form-group-admin">
+<label>Opis skryptu:</label>
+<input type="text" id="scriptDesc" placeholder="Krótki opis">
+</div>
+</div>
+
+<div class="form-row full">
+<div class="form-group-admin">
+<label>Treść skryptu (JS):</label>
+<textarea id="scriptCode" placeholder="np. function test(){...}"></textarea>
+</div>
+</div>
+
+<button class="add-btn" onclick="addScript()">Dodaj Skrypt</button>
+</div>
+
+<div class="section-title">📄 Twoje Skrypty</div>
+<div class="projects-list" id="scriptsList">
+<div class="empty-state">Brak skryptów. Dodaj swój pierwszy skrypt!</div>
+</div>
+
 </div>
 </div>
 
@@ -505,6 +536,7 @@ const ADMIN_PASS = 'admin123';
 document.addEventListener('DOMContentLoaded', function() {
   checkLoginStatus();
   loadProjects();
+  loadScripts();
   
   // Enter w polu hasła
   document.getElementById('password').addEventListener('keypress', function(e) {
@@ -652,7 +684,103 @@ function addProject() {
   
   showSuccess('✅ Projekt został dodany!');
   loadProjects();
-  downloadProjectsFile(); // zapis do pliku
+}
+
+// SCRIPTS HANDLERS
+function getScripts() {
+  const data = localStorage.getItem('scripts');
+  return data ? JSON.parse(data) : [];
+}
+
+function loadScripts() {
+  const scripts = getScripts();
+  const list = document.getElementById('scriptsList');
+  if(!list) return;
+
+  if(scripts.length === 0) {
+    list.innerHTML = '<div class="empty-state">Brak skryptów. Dodaj swój pierwszy skrypt!</div>';
+    return;
+  }
+
+  list.innerHTML = scripts.map(script => `
+    <div class="project-item">
+      <h4>🛠 ${script.name}</h4>
+      <p>${script.desc}</p>
+      <pre style="background: rgba(0,0,0,0.6); border-radius: 8px; padding: 12px; white-space: pre-wrap;">${escapeHtml(script.code)}</pre>
+      <div class="project-actions">
+        <button class="edit-btn" onclick="editScript(${script.id})">✏️ Edytuj</button>
+        <button class="delete-btn" onclick="deleteScript(${script.id})">🗑️ Usuń</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function addScript() {
+  const name = document.getElementById('scriptName').value.trim();
+  const desc = document.getElementById('scriptDesc').value.trim();
+  const code = document.getElementById('scriptCode').value.trim();
+
+  if(!name || !desc || !code) {
+    showError('Wypełnij wszystkie pola skryptu!');
+    return;
+  }
+
+  const scripts = getScripts();
+  scripts.push({
+    id: Date.now(),
+    name,
+    desc,
+    code,
+    date: new Date().toLocaleDateString('pl-PL')
+  });
+
+  localStorage.setItem('scripts', JSON.stringify(scripts));
+  document.getElementById('scriptName').value = '';
+  document.getElementById('scriptDesc').value = '';
+  document.getElementById('scriptCode').value = '';
+
+  const scriptSuccess = document.getElementById('scriptSuccessMsg');
+  scriptSuccess.textContent = '✅ Skrypt został dodany!';
+  scriptSuccess.classList.add('show');
+  setTimeout(() => scriptSuccess.classList.remove('show'), 3000);
+
+  loadScripts();
+}
+
+function editScript(id) {
+  const scripts = getScripts();
+  const script = scripts.find(s => s.id === id);
+  if(!script) return;
+  document.getElementById('scriptName').value = script.name;
+  document.getElementById('scriptDesc').value = script.desc;
+  document.getElementById('scriptCode').value = script.code;
+  deleteScript(id, false);
+}
+
+function deleteScript(id, showMsg = true) {
+  let scripts = getScripts();
+  scripts = scripts.filter(s => s.id !== id);
+  localStorage.setItem('scripts', JSON.stringify(scripts));
+  if(showMsg) showSuccess('✅ Skrypt został usunięty!');
+  loadScripts();
+}
+
+function saveScriptsFile() {
+  const scripts = getScripts();
+  const dataStr = JSON.stringify(scripts, null, 2);
+  const blob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'scripts.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function escapeHtml(text) {
+  const p = document.createElement('p');
+  p.textContent = text;
+  return p.innerHTML;
 }
 
 // GET PROJECTS

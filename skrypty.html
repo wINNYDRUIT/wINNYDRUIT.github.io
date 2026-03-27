@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skrypty - Grzesiu APPs</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+html{scroll-behavior:smooth;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;}
+body{color:#fff;background:linear-gradient(-45deg,#8b0000,#ff4500,#ff6347,#b22222);background-size:400% 400%;min-height:100vh;}
+header{display:flex;justify-content:space-between;align-items:center;padding:20px 10%;backdrop-filter:blur(8px);background:rgba(0,0,0,0.3);position:fixed;width:100%;top:0;z-index:100;}
+.logo{font-size:22px;font-weight:700;background:linear-gradient(45deg,#ff6b35,#ffb347);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+nav a{margin-left:25px;text-decoration:none;color:#d0a080;transition:0.3s;padding:5px 10px;border-radius:5px;}
+nav a:hover{color:#ff6b35;background:rgba(255,107,53,0.15);}
+.logo, nav a { text-decoration:none !important; }
+.main{padding:120px 10%;}
+.card{background:rgba(0,0,0,0.55);border:2px solid rgba(255,107,53,0.45);border-radius:15px;padding:30px;}
+.card h1{color:#ffffff;margin-bottom:15px;text-shadow: 0 0 8px rgba(0,0,0,0.8);}
+.card p{color:#f9f1d4;line-height:1.6;text-shadow: 0 0 6px rgba(0,0,0,0.7);}
+.card pre{background:rgba(0,0,0,0.75);padding:15px;border-radius:10px;overflow:auto;color:#e8e4c5;}
+</style>
+</head>
+<body>
+<header>
+<a class="logo" href="index.html">⚡ Grzesiu APPs</a>
+<nav>
+<a href="index.html">Strona Główna</a>
+</nav>
+</header>
+<div class="main">
+<div class="card">
+<h1>Skrypty do roblox</h1>
+<p>Dodaj skrypty w panelu admina, a tutaj zobaczysz ich listę i treść.</p>
+<div id="scriptsContainer"></div>
+</div>
+</div>
+<script>
+function getScripts() {
+  const data = localStorage.getItem('scripts');
+  return data ? JSON.parse(data) : [];
+}
+
+function renderScripts() {
+  const scripts = getScripts();
+  const container = document.getElementById('scriptsContainer');
+
+  if(!scripts.length) {
+    container.innerHTML = '<p>Brak skryptów. Dodaj nowy skrypt w <a href="admin.html" style="color:#ffb347;">panelu Admin</a>.</p>';
+    return;
+  }
+
+  container.innerHTML = scripts.map(script => `
+    <div style="background: rgba(255,255,255,0.08); border:1px solid rgba(255,107,53,0.35); border-radius:12px; margin-bottom:18px; padding:14px;">
+      <h2 style="color:#ff6b35; margin:0 0 10px;">${script.name}</h2>
+      <p style="margin:0 0 10px; color:#d0a080;">${script.desc}</p>
+      <pre style="background: rgba(0,0,0,0.6); border-radius:8px; padding:12px; overflow:auto;">${escapeHtml(script.code)}</pre>
+      <p style="font-size:0.85rem; color:#bbb; margin-top:8px;">Data: ${script.date || ''}</p>
+    </div>
+  `).join('');
+}
+
+function escapeHtml(text) {
+  const p = document.createElement('p');
+  p.textContent = text;
+  return p.innerHTML;
+}
+
+window.addEventListener('DOMContentLoaded', renderScripts);
+</script>
+</body>
+</html>
