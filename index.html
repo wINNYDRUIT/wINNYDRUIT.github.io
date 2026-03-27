@@ -276,22 +276,8 @@ z-index: 2;
 
 <section class="section" id="projekty">
 <h2>Moje Projekty</h2>
-<div class="projects">
-<div class="project">
-<h3>🚀 Projekt 1</h3>
-<p>Opis twojego pierwszego projektu. Tutaj możesz dodać szczegóły o tym, co robisz i jakie technologie używasz.</p>
-<a class="btn" href="#">Dowiedz się więcej</a>
-</div>
-<div class="project">
-<h3>💡 Projekt 2</h3>
-<p>Opis twojego drugiego projektu. Pokaż swoją kreatywność i umiejętności w praktyce.</p>
-<a class="btn" href="#">Dowiedz się więcej</a>
-</div>
-<div class="project">
-<h3>⭐ Projekt 3</h3>
-<p>Opis twojego trzeciego projektu. Dodaj więcej projektów jeśli chcesz i rozwijaj swoją ofertę!</p>
-<a class="btn" href="#">Dowiedz się więcej</a>
-</div>
+<div class="projects" id="projectsContainer">
+<!-- Projekty będą ładowane dynamicznie -->
 </div>
 </section>
 
@@ -352,6 +338,31 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
       }
     }
   });
+});
+
+// Funkcje do pobierania i wyświetlania projektów z localStorage
+function getProjectsFromStorage() {
+  const data = localStorage.getItem('projects');
+  return data ? JSON.parse(data) : [];
+}
+
+function renderProjects() {
+  const projects = getProjectsFromStorage();
+  const container = document.getElementById('projectsContainer');
+
+  if(!container) return;
+
+  if(projects.length === 0) {
+    container.innerHTML = '<div class="project" style="background: rgba(0,0,0,0.3); border: 2px dashed rgba(255,107,53,0.4);">\n      <h3>Brak projektów</h3>\n      <p>Dodaj projekty w panelu admina.</p>\n      </div>';
+    return;
+  }
+
+  container.innerHTML = projects.map((project, index) => `\n    <div class="project" style="animation: fadeInUp 0.5s ease-out ${0.1 * index}s both;">\n      <h3>${project.emoji || '📌'} ${project.name}</h3>\n      <p>${project.desc}</p>\n      ${project.link ? `<a class="btn" href="${project.link}" target="_blank">Dowiedz się więcej</a>` : ''}\n    </div>\n  `).join('');
+}
+
+// Inicjalizacja projektów przy wczytaniu strony
+document.addEventListener('DOMContentLoaded', () => {
+  renderProjects();
 });
 </script>
 
