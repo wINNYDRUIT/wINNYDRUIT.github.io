@@ -20,12 +20,131 @@ box-sizing:border-box;
 font-family:'Inter',sans-serif;
 }
 
+:root {
+  --bg: linear-gradient(-45deg,#ff4500,#ff6347,#ffb347,#ff8c00);
+  --text: #000;
+  --header-bg: linear-gradient(-45deg,#ff4500,#ff6347,#ffb347,#ff8c00);
+  --logo-admin: #ff6b35;
+  --logout-bg: #d32f2f;
+  --logout-hover: #ff4444;
+  --login-bg: rgba(255,255,255,0.9);
+  --login-border: rgba(255,107,53,0.5);
+  --login-h2: #ff6b35;
+  --form-label: #333;
+  --form-input-bg: rgba(255,255,255,0.9);
+  --form-input-border: rgba(255,107,53,0.3);
+  --form-input-focus-bg: rgba(255,255,255,1);
+  --form-input-focus-border: rgba(255,107,53,0.8);
+  --login-btn-bg: #ff4500;
+  --login-btn-hover: #ff5c1a;
+  --error-bg: rgba(255, 0, 0, 0.2);
+  --error-border: rgba(255, 0, 0, 0.5);
+  --error-color: #d32f2f;
+  --section-title: #ff6b35;
+  --add-project-bg: rgba(255,255,255,0.9);
+  --add-project-border: rgba(255,107,53,0.3);
+  --form-admin-label: #333;
+  --form-admin-input-bg: rgba(255,255,255,0.9);
+  --form-admin-input-border: rgba(255,107,53,0.3);
+  --form-admin-input-focus-bg: rgba(255,255,255,1);
+  --form-admin-input-focus-border: rgba(255,107,53,0.8);
+  --add-btn-bg: #4CAF50;
+  --add-btn-hover: #45a049;
+  --project-item-bg: rgba(255,255,255,0.9);
+  --project-item-border: rgba(255,107,53,0.3);
+  --project-item-hover-border: rgba(255,179,71,0.8);
+  --project-item-h4: #ff6b35;
+  --project-item-p: #333;
+  --edit-btn-bg: #2196F3;
+  --edit-btn-hover: #0b7dda;
+  --delete-btn-bg: #d32f2f;
+  --delete-btn-hover: #ff4444;
+  --empty-state: #333;
+  --success-bg: rgba(76, 175, 80, 0.2);
+  --success-border: rgba(76, 175, 80, 0.5);
+  --success-color: #4CAF50;
+}
+
+.dark-mode {
+  --bg: linear-gradient(-45deg, #040404, #0b1a2b, #10171f, #020405);
+  --text: #e8f3ff;
+  --header-bg: rgba(0, 0, 0, 0.65);
+  --logo-admin: #32cd32;
+  --logout-bg: #b30000;
+  --logout-hover: #ff4444;
+  --login-bg: rgba(0, 0, 0, 0.7);
+  --login-border: rgba(0, 120, 0, 0.8);
+  --login-h2: #32cd32;
+  --form-label: #90ee90;
+  --form-input-bg: rgba(0,100,0,0.1);
+  --form-input-border: rgba(0,100,0,0.3);
+  --form-input-focus-bg: rgba(0,100,0,0.2);
+  --form-input-focus-border: rgba(0,100,0,0.8);
+  --login-btn-bg: #006400;
+  --login-btn-hover: #32cd32;
+  --error-bg: rgba(255, 0, 0, 0.2);
+  --error-border: rgba(255, 0, 0, 0.5);
+  --error-color: #ff6b6b;
+  --section-title: #006400;
+  --add-project-bg: rgba(0, 0, 0, 0.4);
+  --add-project-border: rgba(0,100,0,0.3);
+  --form-admin-label: #90ee90;
+  --form-admin-input-bg: rgba(0,100,0,0.1);
+  --form-admin-input-border: rgba(0,100,0,0.3);
+  --form-admin-input-focus-bg: rgba(0,100,0,0.2);
+  --form-admin-input-focus-border: rgba(0,100,0,0.8);
+  --add-btn-bg: #4CAF50;
+  --add-btn-hover: #45a049;
+  --project-item-bg: rgba(0, 0, 0, 0.4);
+  --project-item-border: rgba(0,100,0,0.3);
+  --project-item-hover-border: rgba(50,205,50,0.8);
+  --project-item-h4: #006400;
+  --project-item-p: #90ee90;
+  --edit-btn-bg: #2196F3;
+  --edit-btn-hover: #0b7dda;
+  --delete-btn-bg: #d32f2f;
+  --delete-btn-hover: #ff4444;
+  --empty-state: #90ee90;
+  --success-bg: rgba(76, 175, 80, 0.2);
+  --success-border: rgba(76, 175, 80, 0.5);
+  --success-color: #90EE90;
+}
+
 body{
-color:#ffffff;
-background: linear-gradient(-45deg, #8b0000, #ff4500, #ff6347, #b22222);
+color:var(--text);
+background: var(--bg);
 background-size:400% 400%;
 transition: background-position 0.05s ease-out;
 min-height: 100vh;
+}
+
+.theme-wipe {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  pointer-events: none;
+  z-index: 9999;
+  transform: translateX(-100%);
+}
+
+.theme-wipe.slide-to-dark {
+  animation: wipe-right 0.5s ease forwards;
+}
+
+.theme-wipe.slide-to-light {
+  animation: wipe-left 0.5s ease forwards;
+}
+
+@keyframes wipe-right {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(0); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes wipe-left {
+  0% { transform: translateX(100%); }
+  50% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
 }
 
 /* LOGIN PAGE */
@@ -51,9 +170,9 @@ opacity: 1;
 }
 
 .login-box{
-background: rgba(0, 0, 0, 0.5);
+background: var(--login-bg);
 backdrop-filter: blur(10px);
-border: 2px solid rgba(255, 107, 53, 0.5);
+border: 2px solid var(--login-border);
 border-radius: 15px;
 padding: 50px;
 max-width: 400px;
@@ -74,7 +193,7 @@ animation: fadeOut 0.4s ease-out forwards;
 font-size: 2rem;
 margin-bottom: 30px;
 text-align: center;
-color: #ff6b35;
+color: var(--login-h2);
 }
 
 .form-group{
@@ -84,25 +203,25 @@ margin-bottom: 20px;
 .form-group label{
 display: block;
 margin-bottom: 8px;
-color: #d0a080;
+color: var(--form-label);
 font-weight: 600;
 }
 
 .form-group input{
 width: 100%;
 padding: 12px;
-background: rgba(255, 107, 53, 0.1);
-border: 1px solid rgba(255, 107, 53, 0.3);
+background: var(--form-input-bg);
+border: 1px solid var(--form-input-border);
 border-radius: 8px;
-color: #ffffff;
+color: var(--text);
 font-size: 1rem;
 transition: all 0.3s ease;
 }
 
 .form-group input:focus{
 outline: none;
-background: rgba(255, 107, 53, 0.2);
-border-color: rgba(255, 107, 53, 0.8);
+background: var(--form-input-focus-bg);
+border-color: var(--form-input-focus-border);
 box-shadow: 0 0 15px rgba(255, 107, 53, 0.4);
 }
 
@@ -113,7 +232,7 @@ color: rgba(255, 255, 255, 0.5);
 .login-btn{
 width: 100%;
 padding: 14px;
-background: #ff4500;
+background: var(--login-btn-bg);
 border: none;
 border-radius: 8px;
 color: white;
@@ -125,15 +244,15 @@ margin-top: 10px;
 }
 
 .login-btn:hover{
-background: #ff5c1a;
+background: var(--login-btn-hover);
 box-shadow: 0 0 30px rgba(255, 69, 0, 0.6);
 transform: scale(1.02);
 }
 
 .error-msg{
-background: rgba(255, 0, 0, 0.2);
-border: 1px solid rgba(255, 0, 0, 0.5);
-color: #ff6b6b;
+background: var(--error-bg);
+border: 1px solid var(--error-border);
+color: var(--error-color);
 padding: 12px;
 border-radius: 8px;
 margin-bottom: 20px;
@@ -163,7 +282,7 @@ justify-content: space-between;
 align-items: center;
 padding: 20px;
 backdrop-filter: blur(8px);
-background: rgba(0, 0, 0, 0.3);
+background: var(--bg);
 border-bottom: 1px solid rgba(255, 107, 53, 0.3);
 border-radius: 10px;
 margin-bottom: 30px;
@@ -173,12 +292,12 @@ animation: slideDown 0.6s ease-out;
 .logo-admin{
 font-size: 20px;
 font-weight: 700;
-color: #ff6b35;
+color: var(--logo-admin);
 }
 
 .logout-btn{
 padding: 10px 20px;
-background: #d32f2f;
+background: var(--logout-bg);
 border: none;
 border-radius: 8px;
 color: white;
@@ -188,7 +307,7 @@ transition: all 0.3s ease;
 }
 
 .logout-btn:hover{
-background: #ff4444;
+background: var(--logout-hover);
 box-shadow: 0 0 20px rgba(211, 47, 47, 0.6);
 }
 
@@ -200,14 +319,14 @@ animation: fadeInUp 0.6s ease-out 0.2s both;
 
 .section-title{
 font-size: 2rem;
-color: #ff6b35;
+color: var(--section-title);
 margin-bottom: 30px;
 margin-top: 40px;
 }
 
 .add-project-form{
-background: rgba(0, 0, 0, 0.4);
-border: 2px solid rgba(255, 107, 53, 0.3);
+background: var(--add-project-bg);
+border: 2px solid var(--add-project-border);
 border-radius: 15px;
 padding: 30px;
 margin-bottom: 40px;
@@ -232,17 +351,17 @@ flex-direction: column;
 
 .form-group-admin label{
 margin-bottom: 8px;
-color: #d0a080;
+color: var(--form-admin-label);
 font-weight: 600;
 }
 
 .form-group-admin input,
 .form-group-admin textarea{
 padding: 12px;
-background: rgba(255, 107, 53, 0.1);
-border: 1px solid rgba(255, 107, 53, 0.3);
+background: var(--form-admin-input-bg);
+border: 1px solid var(--form-admin-input-border);
 border-radius: 8px;
-color: #ffffff;
+color: var(--text);
 font-size: 1rem;
 font-family: 'Inter', sans-serif;
 transition: all 0.3s ease;
@@ -256,14 +375,14 @@ min-height: 100px;
 .form-group-admin input:focus,
 .form-group-admin textarea:focus{
 outline: none;
-background: rgba(255, 107, 53, 0.2);
-border-color: rgba(255, 107, 53, 0.8);
+background: var(--form-admin-input-focus-bg);
+border-color: var(--form-admin-input-focus-border);
 box-shadow: 0 0 15px rgba(255, 107, 53, 0.4);
 }
 
 .add-btn{
 padding: 14px 30px;
-background: #4CAF50;
+background: var(--add-btn-bg);
 border: none;
 border-radius: 8px;
 color: white;
@@ -275,7 +394,7 @@ margin-top: 10px;
 }
 
 .add-btn:hover{
-background: #45a049;
+background: var(--add-btn-hover);
 box-shadow: 0 0 30px rgba(76, 175, 80, 0.6);
 transform: scale(1.02);
 }
@@ -287,8 +406,8 @@ gap: 25px;
 }
 
 .project-item{
-background: rgba(0, 0, 0, 0.4);
-border: 2px solid rgba(255, 107, 53, 0.3);
+background: var(--project-item-bg);
+border: 2px solid var(--project-item-border);
 border-radius: 15px;
 padding: 25px;
 backdrop-filter: blur(10px);
@@ -297,18 +416,18 @@ transition: all 0.3s ease;
 
 .project-item:hover{
 transform: translateY(-5px);
-border-color: rgba(255, 179, 71, 0.8);
+border-color: var(--project-item-hover-border);
 box-shadow: 0 10px 40px rgba(255, 107, 53, 0.3);
 }
 
 .project-item h4{
-color: #ff6b35;
+color: var(--project-item-h4);
 margin-bottom: 10px;
 font-size: 1.3rem;
 }
 
 .project-item p{
-color: #d0a080;
+color: var(--project-item-p);
 margin-bottom: 15px;
 font-size: 0.95rem;
 }
@@ -329,36 +448,36 @@ flex: 1;
 }
 
 .edit-btn{
-background: #2196F3;
+background: var(--edit-btn-bg);
 color: white;
 }
 
 .edit-btn:hover{
-background: #0b7dda;
+background: var(--edit-btn-hover);
 box-shadow: 0 0 15px rgba(33, 150, 243, 0.6);
 }
 
 .delete-btn{
-background: #d32f2f;
+background: var(--delete-btn-bg);
 color: white;
 }
 
 .delete-btn:hover{
-background: #ff4444;
+background: var(--delete-btn-hover);
 box-shadow: 0 0 15px rgba(211, 47, 47, 0.6);
 }
 
 .empty-state{
 text-align: center;
 padding: 60px 20px;
-color: #d0a080;
+color: var(--empty-state);
 font-size: 1.1rem;
 }
 
 .success-msg{
-background: rgba(76, 175, 80, 0.2);
-border: 1px solid rgba(76, 175, 80, 0.5);
-color: #90EE90;
+background: var(--success-bg);
+border: 1px solid var(--success-border);
+color: var(--success-color);
 padding: 12px;
 border-radius: 8px;
 margin-bottom: 20px;
@@ -424,6 +543,7 @@ display: block;
 </head>
 
 <body>
+<div id="theme-wipe" class="theme-wipe"></div>
 
 <!-- LOGIN PAGE -->
 <div class="login-container active" id="loginContainer">
@@ -449,7 +569,10 @@ Demo: login: <strong>admin</strong> | hasło: <strong>admin123</strong>
 <div class="admin-container" id="adminContainer">
 <header>
 <a class="logo-admin" href="index.html">⚡ Admin Panel - Grzesiu APPs</a>
+<div>
 <button class="logout-btn" onclick="logout()">Wyloguj się</button>
+<button id="theme-toggle" style="margin-left:10px; background:none; border:none; color:var(--form-label); font-size:20px; cursor:pointer;">🌙</button>
+</div>
 </header>
 
 <div class="admin-content">
@@ -848,6 +971,42 @@ document.addEventListener('mousemove', e => {
   const yPercent = (e.clientY / window.innerHeight) * 100;
   document.body.style.backgroundPosition = `${xPercent}% ${yPercent}%`;
 });
+
+const themeToggle = document.getElementById('theme-toggle');
+const themeWipe = document.getElementById('theme-wipe');
+
+function setTheme(dark) {
+  if (dark) {
+    document.body.classList.add('dark-mode');
+    themeToggle.textContent = '☀️';
+    localStorage.setItem('theme', 'dark');
+  } else {
+    document.body.classList.remove('dark-mode');
+    themeToggle.textContent = '🌙';
+    localStorage.setItem('theme', 'light');
+  }
+}
+
+function initTheme() {
+  const theme = localStorage.getItem('theme');
+  setTheme(theme === 'dark');
+}
+
+themeToggle.addEventListener('click', () => {
+  const toDark = !document.body.classList.contains('dark-mode');
+  themeWipe.classList.remove('slide-to-dark', 'slide-to-light');
+  themeWipe.classList.add(toDark ? 'slide-to-dark' : 'slide-to-light');
+
+  setTimeout(() => {
+    setTheme(toDark);
+  }, 250);
+
+  themeWipe.addEventListener('animationend', () => {
+    themeWipe.classList.remove('slide-to-dark', 'slide-to-light');
+  }, { once: true });
+});
+
+document.addEventListener('DOMContentLoaded', initTheme);
 </script>
 
 </body>
