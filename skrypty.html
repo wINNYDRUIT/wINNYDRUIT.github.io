@@ -5,6 +5,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Skrypty - Grzesiu APPs</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+  // TODO: Replace with your Firebase config
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.db = db;
+  window.collection = collection;
+  window.getDocs = getDocs;
+</script>
+
 <style>
 html{scroll-behavior:smooth;}
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;}
@@ -106,13 +130,22 @@ nav{background:transparent;}
 </div>
 </div>
 <script>
-function getScripts() {
-  const data = localStorage.getItem('scripts');
-  return data ? JSON.parse(data) : [];
+async function getScripts() {
+  try {
+    const querySnapshot = await getDocs(collection(db, "scripts"));
+    const scripts = [];
+    querySnapshot.forEach((doc) => {
+      scripts.push(doc.data());
+    });
+    return scripts;
+  } catch (error) {
+    console.error("Error getting scripts: ", error);
+    return [];
+  }
 }
 
-function renderScripts() {
-  const scripts = getScripts();
+async function renderScripts() {
+  const scripts = await getScripts();
   const container = document.getElementById('scriptsContainer');
 
   if(!scripts.length) {
@@ -136,7 +169,9 @@ function escapeHtml(text) {
   return p.innerHTML;
 }
 
-window.addEventListener('DOMContentLoaded', renderScripts);
+window.addEventListener('DOMContentLoaded', async () => {
+  await renderScripts();
+});
 
 document.addEventListener('mousemove', e => {
   const xPercent = (e.clientX / window.innerWidth) * 100;

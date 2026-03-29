@@ -8,6 +8,33 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+  // TODO: Replace with your Firebase config
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.db = db;
+  window.collection = collection;
+  window.addDoc = addDoc;
+  window.getDocs = getDocs;
+  window.doc = doc;
+  window.updateDoc = updateDoc;
+  window.deleteDoc = deleteDoc;
+</script>
+
 <style>
 html{
 scroll-behavior:smooth;
@@ -656,10 +683,10 @@ const ADMIN_USER = 'admin';
 const ADMIN_PASS = 'admin123';
 
 // Inicjalizacja
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
   checkLoginStatus();
-  loadProjects();
-  loadScripts();
+  await loadProjects();
+  await loadScripts();
   
   // Enter w polu hasła
   document.getElementById('password').addEventListener('keypress', function(e) {
@@ -775,7 +802,8 @@ function clearLoginForms() {
 }
 
 // ADD PROJECT
-function addProject() {
+// ADD PROJECT
+async function addProject() {
   const emoji = document.getElementById('projectEmoji').value || '📌';
   const name = document.getElementById('projectName').value.trim();
   const desc = document.getElementById('projectDesc').value.trim();
@@ -786,37 +814,46 @@ function addProject() {
     return;
   }
   
-  const projects = getProjects();
-  const newProject = {
-    id: Date.now(),
-    emoji,
-    name,
-    desc,
-    link,
-    date: new Date().toLocaleDateString('pl-PL')
-  };
-  
-  projects.push(newProject);
-  localStorage.setItem('projects', JSON.stringify(projects));
-  
-  // Clear form
-  document.getElementById('projectEmoji').value = '🚀';
-  document.getElementById('projectName').value = '';
-  document.getElementById('projectDesc').value = '';
-  document.getElementById('projectLink').value = '';
-  
-  showSuccess('✅ Projekt został dodany!');
-  loadProjects();
+  try {
+    await addDoc(collection(db, "projects"), {
+      emoji,
+      name,
+      desc,
+      link,
+      date: new Date().toLocaleDateString('pl-PL')
+    });
+    
+    // Clear form
+    document.getElementById('projectEmoji').value = '🚀';
+    document.getElementById('projectName').value = '';
+    document.getElementById('projectDesc').value = '';
+    document.getElementById('projectLink').value = '';
+    
+    showSuccess('✅ Projekt został dodany!');
+    loadProjects();
+  } catch (error) {
+    console.error("Error adding project: ", error);
+    showError('Błąd podczas dodawania projektu!');
+  }
 }
 
 // SCRIPTS HANDLERS
-function getScripts() {
-  const data = localStorage.getItem('scripts');
-  return data ? JSON.parse(data) : [];
+async function getScripts() {
+  try {
+    const querySnapshot = await getDocs(collection(db, "scripts"));
+    const scripts = [];
+    querySnapshot.forEach((doc) => {
+      scripts.push({ id: doc.id, ...doc.data() });
+    });
+    return scripts;
+  } catch (error) {
+    console.error("Error getting scripts: ", error);
+    return [];
+  }
 }
 
-function loadScripts() {
-  const scripts = getScripts();
+async function loadScripts() {
+  const scripts = await getScripts();
   const list = document.getElementById('scriptsList');
   if(!list) return;
 
@@ -831,14 +868,14 @@ function loadScripts() {
       <p>${script.desc}</p>
       <pre style="background: rgba(0,0,0,0.6); border-radius: 8px; padding: 12px; white-space: pre-wrap;">${escapeHtml(script.code)}</pre>
       <div class="project-actions">
-        <button class="edit-btn" onclick="editScript(${script.id})">✏️ Edytuj</button>
-        <button class="delete-btn" onclick="deleteScript(${script.id})">🗑️ Usuń</button>
+        <button class="edit-btn" onclick="editScript('${script.id}')">✏️ Edytuj</button>
+        <button class="delete-btn" onclick="deleteScript('${script.id}')">🗑️ Usuń</button>
       </div>
     </div>
   `).join('');
 }
 
-function addScript() {
+async function addScript() {
   const name = document.getElementById('scriptName').value.trim();
   const desc = document.getElementById('scriptDesc').value.trim();
   const code = document.getElementById('scriptCode').value.trim();
@@ -848,44 +885,53 @@ function addScript() {
     return;
   }
 
-  const scripts = getScripts();
-  scripts.push({
-    id: Date.now(),
-    name,
-    desc,
-    code,
-    date: new Date().toLocaleDateString('pl-PL')
-  });
+  try {
+    await addDoc(collection(db, "scripts"), {
+      name,
+      desc,
+      code,
+      date: new Date().toLocaleDateString('pl-PL')
+    });
 
-  localStorage.setItem('scripts', JSON.stringify(scripts));
-  document.getElementById('scriptName').value = '';
-  document.getElementById('scriptDesc').value = '';
-  document.getElementById('scriptCode').value = '';
+    document.getElementById('scriptName').value = '';
+    document.getElementById('scriptDesc').value = '';
+    document.getElementById('scriptCode').value = '';
 
-  const scriptSuccess = document.getElementById('scriptSuccessMsg');
-  scriptSuccess.textContent = '✅ Skrypt został dodany!';
-  scriptSuccess.classList.add('show');
-  setTimeout(() => scriptSuccess.classList.remove('show'), 3000);
+    const scriptSuccess = document.getElementById('scriptSuccessMsg');
+    scriptSuccess.textContent = '✅ Skrypt został dodany!';
+    scriptSuccess.classList.add('show');
+    setTimeout(() => scriptSuccess.classList.remove('show'), 3000);
 
-  loadScripts();
+    loadScripts();
+  } catch (error) {
+    console.error("Error adding script: ", error);
+    showError('Błąd podczas dodawania skryptu!');
+  }
 }
 
-function editScript(id) {
-  const scripts = getScripts();
-  const script = scripts.find(s => s.id === id);
-  if(!script) return;
-  document.getElementById('scriptName').value = script.name;
-  document.getElementById('scriptDesc').value = script.desc;
-  document.getElementById('scriptCode').value = script.code;
-  deleteScript(id, false);
+async function editScript(id) {
+  try {
+    const scripts = await getScripts();
+    const script = scripts.find(s => s.id === id);
+    if(!script) return;
+    document.getElementById('scriptName').value = script.name;
+    document.getElementById('scriptDesc').value = script.desc;
+    document.getElementById('scriptCode').value = script.code;
+    await deleteScript(id, false);
+  } catch (error) {
+    console.error("Error editing script: ", error);
+  }
 }
 
-function deleteScript(id, showMsg = true) {
-  let scripts = getScripts();
-  scripts = scripts.filter(s => s.id !== id);
-  localStorage.setItem('scripts', JSON.stringify(scripts));
-  if(showMsg) showSuccess('✅ Skrypt został usunięty!');
-  loadScripts();
+async function deleteScript(id, showMsg = true) {
+  try {
+    await deleteDoc(doc(db, "scripts", id));
+    if(showMsg) showSuccess('✅ Skrypt został usunięty!');
+    loadScripts();
+  } catch (error) {
+    console.error("Error deleting script: ", error);
+    showError('Błąd podczas usuwania skryptu!');
+  }
 }
 
 function saveScriptsFile() {
@@ -907,14 +953,23 @@ function escapeHtml(text) {
 }
 
 // GET PROJECTS
-function getProjects() {
-  const data = localStorage.getItem('projects');
-  return data ? JSON.parse(data) : [];
+async function getProjects() {
+  try {
+    const querySnapshot = await getDocs(collection(db, "projects"));
+    const projects = [];
+    querySnapshot.forEach((doc) => {
+      projects.push({ id: doc.id, ...doc.data() });
+    });
+    return projects;
+  } catch (error) {
+    console.error("Error getting projects: ", error);
+    return [];
+  }
 }
 
 // LOAD PROJECTS
-function loadProjects() {
-  const projects = getProjects();
+async function loadProjects() {
+  const projects = await getProjects();
   const list = document.getElementById('projectsList');
   
   if(projects.length === 0) {
@@ -929,39 +984,47 @@ function loadProjects() {
       <p style="font-size: 0.85rem; color: #888; margin-bottom: 15px;">Dodano: ${project.date}</p>
       ${project.link ? `<p><a href="${project.link}" target="_blank" style="color: #ff6b35; text-decoration: none;">🔗 Otwórz Link</a></p>` : ''}
       <div class="project-actions">
-        <button class="edit-btn" onclick="editProject(${project.id})">✏️ Edytuj</button>
-        <button class="delete-btn" onclick="deleteProject(${project.id})">🗑️ Usuń</button>
+        <button class="edit-btn" onclick="editProject('${project.id}')">✏️ Edytuj</button>
+        <button class="delete-btn" onclick="deleteProject('${project.id}')">🗑️ Usuń</button>
       </div>
     </div>
   `).join('');
 }
 
 // EDIT PROJECT
-function editProject(id) {
-  const projects = getProjects();
-  const project = projects.find(p => p.id === id);
-  
-  if(!project) return;
-  
-  document.getElementById('projectEmoji').value = project.emoji;
-  document.getElementById('projectName').value = project.name;
-  document.getElementById('projectDesc').value = project.desc;
-  document.getElementById('projectLink').value = project.link || '';
-  
-  document.querySelector('.add-project-form').scrollIntoView({ behavior: 'smooth' });
-  
-  deleteProject(id, false);
+async function editProject(id) {
+  try {
+    const projects = await getProjects();
+    const project = projects.find(p => p.id === id);
+    
+    if(!project) return;
+    
+    document.getElementById('projectEmoji').value = project.emoji;
+    document.getElementById('projectName').value = project.name;
+    document.getElementById('projectDesc').value = project.desc;
+    document.getElementById('projectLink').value = project.link || '';
+    
+    document.querySelector('.add-project-form').scrollIntoView({ behavior: 'smooth' });
+    
+    await deleteProject(id, false);
+  } catch (error) {
+    console.error("Error editing project: ", error);
+  }
 }
 
 // DELETE PROJECT
-function deleteProject(id, showMsg = true) {
+// DELETE PROJECT
+async function deleteProject(id, showMsg = true) {
   if(!showMsg || confirm('Na pewno chcesz usunąć ten projekt?')) {
-    let projects = getProjects();
-    projects = projects.filter(p => p.id !== id);
-    localStorage.setItem('projects', JSON.stringify(projects));
-    
-    if(showMsg) showSuccess('✅ Projekt został usunięty!');
-    loadProjects();
+    try {
+      await deleteDoc(doc(db, "projects", id));
+      
+      if(showMsg) showSuccess('✅ Projekt został usunięty!');
+      loadProjects();
+    } catch (error) {
+      console.error("Error deleting project: ", error);
+      showError('Błąd podczas usuwania projektu!');
+    }
   }
 }
 
