@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grzesiu APPs</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* Smooth scroll */
+html{
+scroll-behavior:smooth;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Inter',sans-serif;
+}
+
+:root {
+  --bg: linear-gradient(-45deg, #8b0000, #ff4500, #ff6347, #b22222);
+  --text: #ffffff;
+  --header-bg: rgba(0, 0, 0, 0.3);
+  --logo-gradient: linear-gradient(45deg, #ff6b35, #ffb347);
+  --nav-color: #d0a080;
+  --nav-hover: #ff6b35;
+  --nav-hover-bg: rgba(255,107,53,0.15);
+  --hero-h1: #ffffff;
+  --hero-p: #ffffff;
+  --btn-bg: #ff4500;
+  --btn-hover: #ff5c1a;
+  --project-bg: rgba(0,0,0,0.4);
+  --project-border: rgba(255,107,53,0.3);
+  --project-hover-bg: rgba(255,107,53,0.15);
+  --project-hover-border: rgba(255,179,71,0.8);
+  --project-h3: #ffffff;
+  --project-p: #f7f1dc;
+  --script-card-bg: rgba(0,0,0,0.4);
+  --script-card-border: rgba(255,107,53,0.3);
+  --script-card-hover-bg: rgba(0,0,0,0.5);
+  --script-card-hover-border: rgba(255,179,71,0.8);
+  --script-card-h3: #ffffff;
+  --script-card-p: #f7f1dc;
+  --footer-bg: rgba(0, 0, 0, 0.3);
+  --footer-border: rgba(255,107,53,0.2);
+}
+
+.dark-mode {
+  --bg: linear-gradient(-45deg, #040404, #0b1a2b, #10171f, #020405);
+  --text: #f4feff;
+  --header-bg: rgba(0,0,0,0.65);
+  --logo-gradient: linear-gradient(45deg,#006400,#32cd32);
+  --nav-color: #90ee90;
+  --nav-hover: #00ff9d;
+  --nav-hover-bg: rgba(0,100,0,0.2);
+  --hero-h1: #f7fffc;
+  --hero-p: #d4f5d4;
+  --btn-bg: #006400;
+  --btn-hover: #32cd32;
+  --project-bg: rgba(0,0,0,0.55);
+  --project-border: rgba(0,100,0,0.35);
+  --project-hover-bg: rgba(0,100,0,0.15);
+  --project-hover-border: rgba(50,205,50,0.8);
+  --project-h3: #ffffff;
+  --project-p: #f0e68c;
+  --script-card-bg: rgba(0,0,0,0.4);
+  --script-card-border: rgba(0,100,0,0.3);
+  --script-card-hover-bg: rgba(0, 0, 0, 0.5);
+  --script-card-hover-border: rgba(50,205,50,0.8);
+  --script-card-h3: #ffffff;
+  --script-card-p: #f0e68c;
+  --footer-bg: rgba(0, 0, 0, 0.3);
+  --footer-border: rgba(0,100,0,0.2);
+}
+
+/* Body i dynamiczne tło z gradientem i efektem kursora */
+body{
+color:var(--text);
+background: var(--bg);
+background-size:400% 400%;
+transition: background-position 0.05s ease-out;
+min-height: 100vh;
+}
+
+/* Nagłówek */
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:20px 10%;
+backdrop-filter:blur(8px);
+background: var(--header-bg);
+position: fixed;
+width: 100%;
+top: 0;
+z-index: 100;
+animation: slideDown 0.6s ease-out;
+}
+
+.logo{
+font-size:22px;
+font-weight:700;
+background: var(--logo-gradient);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+}
+
+nav a{
+margin-left:25px;
+text-decoration:none;
+color:var(--nav-color);
+transition:0.3s;
+cursor: pointer;
+padding: 5px 10px;
+border-radius: 5px;
+}
+
+.logo{
+text-decoration: none;
+}
+
+nav a:hover, nav a.active{
+color: var(--nav-hover);
+opacity:1;
+background: var(--nav-hover-bg);
+}
+
+nav{
+background: transparent;
+}
+
+.theme-wipe {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  pointer-events: none;
+  z-index: 9999;
+  transform: translateX(-100%);
+}
+
+.theme-wipe.slide-to-dark {
+  animation: wipe-right 0.5s ease forwards;
+}
+
+.theme-wipe.slide-to-light {
+  animation: wipe-left 0.5s ease forwards;
+}
+
+@keyframes wipe-right {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(0); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes wipe-left {
+  0% { transform: translateX(100%); }
+  50% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+/* Hero */
+.hero{
+height:100vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+padding:20px;
+margin-top: 60px;
+animation: fadeInUp 0.8s ease-out;
+}
+
+.hero h1{
+font-size:60px;
+margin-bottom:15px;
+color: var(--hero-h1);
+font-weight: 900;
+letter-spacing: 2px;
+animation: scaleIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+text-shadow: 0 0 30px rgba(255, 107, 53, 0.8), 0 0 60px rgba(255, 69, 0, 0.6);
+}
+
+.hero p{
+max-width:600px;
+margin-bottom:30px;
+opacity:1;
+font-size: 1.2rem;
+color: var(--hero-p);
+animation: fadeInUp 0.8s ease-out 0.2s both;
+text-shadow: 0 0 20px rgba(255, 107, 53, 0.7);
+}
+
+/* Przycisk */
+.btn{
+background:var(--btn-bg);
+padding:16px 40px;
+border-radius:50px;
+text-decoration:none;
+color:white;
+font-weight:600;
+transition:all 0.3s ease;
+position:relative;
+z-index:2;
+margin-top:10px;
+display:inline-block;
+border: none;
+cursor: pointer;
+box-shadow: 0 0 25px rgba(255, 69, 0, 0.6), 0 0 40px rgba(255, 69, 0, 0.3);
+animation: fadeInUp 0.8s ease-out 0.4s both;
+}
+
+.btn:hover{
+transform:scale(1.12);
+background: var(--btn-hover);
+box-shadow: 
+0 0 50px rgba(255, 69, 0, 1),
+0 0 100px rgba(255, 69, 0, 0.6),
+0 0 25px rgba(255, 179, 71, 0.8);
+filter: brightness(1.15);
+}
+
+.btn:active{
+transform: scale(1.05);
+}
+
+/* Sekcja projektu */
+.section{
+padding:100px 10%;
+position: relative;
+z-index: 2;
+}
+
+.section h2{
+text-align:center;
+margin-bottom:60px;
+font-size:44px;
+background: var(--logo-gradient);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+font-weight: 900;
+letter-spacing: 1px;
+animation: fadeInUp 0.6s ease-out;
+}
+
+.projects{
+display:grid;
+grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+gap:40px;
+justify-items:center;
+max-width: 1200px;
+margin: 0 auto;
+}
+
+.project{
+background:var(--project-bg);
+padding:40px;
+border-radius:15px;
+backdrop-filter:blur(10px);
+border: 2px solid var(--project-border);
+transition:all 0.5s ease;
+opacity:0;
+transform:translateY(40px);
+text-align:center;
+will-change: transform, box-shadow;
+backface-visibility: hidden;
+}
+
+.projects .project:nth-child(1) { animation-delay: 0.1s; }
+.projects .project:nth-child(2) { animation-delay: 0.2s; }
+.projects .project:nth-child(3) { animation-delay: 0.3s; }
+
+.project h3{
+font-size: 1.8rem;
+color: var(--project-h3);
+margin-bottom: 15px;
+font-weight: 700;
+text-shadow: 0px 0px 8px rgba(0,0,0,0.6);
+}
+
+.project p{
+  color: var(--project-p);
+  line-height: 1.7;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+  text-shadow: 0px 0px 6px rgba(0,0,0,0.5);
+}
+
+.project:hover{
+  transform:translateY(-12px) scale(1.03);
+  background: var(--project-hover-bg);
+  border-color: var(--project-hover-border);
+  box-shadow:
+    0 15px 50px rgba(255, 107, 53, 0.5),
+    inset 0 0 20px rgba(255, 107, 53, 0.2),
+    0 0 30px rgba(255, 179, 71, 0.4);
+}
+
+.script-card{
+background:var(--script-card-bg);
+padding:40px;
+border-radius:15px;
+backdrop-filter:blur(10px);
+border: 2px solid var(--script-card-border);
+transition:all 0.5s ease;
+opacity:0;
+transform:translateY(40px);
+text-align:center;
+will-change: transform, box-shadow;
+backface-visibility: hidden;
+}
+
+.script-card h3{font-size: 1.8rem;color: var(--script-card-h3);margin-bottom: 15px;font-weight: 700;text-shadow: 0px 0px 8px rgba(0,0,0,0.6);}
+.script-card p{color: var(--script-card-p);line-height: 1.7;margin-bottom: 20px;font-size: 0.95rem;text-shadow: 0px 0px 6px rgba(0,0,0,0.5);}
+
+.script-card:hover{
+  transform:translateY(-12px) scale(1.03);
+  background: var(--script-card-hover-bg);
+  border-color: var(--script-card-hover-border);
+  box-shadow:
+    0 15px 50px rgba(255, 107, 53, 0.5),
+    inset 0 0 20px rgba(255, 107, 53, 0.2),
+    0 0 30px rgba(255, 179, 71, 0.4);
+}
+
+/* Footer */
+footer{
+margin-top:80px;
+padding:40px 10%;
+text-align:center;
+opacity:0.8;
+border-top: 1px solid var(--footer-border);
+background: var(--header-bg);
+position: relative;
+z-index: 2;
+}
+
+/* Animacje */
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.7);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+<div id="theme-wipe" class="theme-wipe"></div>
+<header>
+<a class="logo" href="#home">⚡ Grzesiu APPs</a>
+<nav>
+<a href="#home" class="nav-link active">Home</a>
+<a href="#projekty" class="nav-link">Projekty</a>
+<a href="#skrypty" class="nav-link">Skrypty</a>
+<a href="#kontakt" class="nav-link">Kontakt</a>
+<button id="theme-toggle" style="margin-left:25px; background:none; border:none; color:var(--nav-color); font-size:20px; cursor:pointer;">🌙</button>
+</nav>
+</header>
+
+<section class="hero" id="home">
+<h1>Grzesiu Apps</h1>
+<p>Odkrywaj moje projekty i aplikacje</p>
+<a class="btn" href="#projekty">Przejdź do Projektów</a>
+</section>
+
+<section class="section" id="projekty">
+<h2>Moje Projekty</h2>
+<div class="projects" id="projectsContainer">
+<!-- Projekty będą ładowane dynamicznie -->
+</div>
+</section>
+
+<section class="section" id="skrypty">
+<h2>Skrypty</h2>
+<div class="scripts" style="display:grid; grid-template-columns:1fr; gap:20px;">
+<div class="script-card">
+<h3>📄 Skrypty do ROBLOX</h3>
+<p>W tej sekcji możesz zamieszczać przydatne skrypty oraz fragmenty kodu do wstawienia w Twoje aplikacje.</p>
+<a class="btn" href="skrypty.html">Przejdź do pełnej sekcji Skrypty</a>
+</div>
+</div>
+</section>
+
+<footer id="kontakt">
+© 2026 Grzesiu APPs - Wszystkie prawa zastrzeżone
+</footer>
+
+<script>
+/* Animacja pojawiania projektów na scroll */
+const projectElements = document.querySelectorAll(".project");
+const scriptElements = document.querySelectorAll(".script-card");
+
+function showProjects(){
+  projectElements.forEach(el => {
+    const position = el.getBoundingClientRect().top;
+    const screenPosition = window.innerHeight / 1.2;
+    if(position < screenPosition){
+      el.style.opacity = "1";
+      el.style.transform = "translateY(0)";
+    }
+  });
+}
+
+function showScripts(){
+  scriptElements.forEach(el => {
+    const position = el.getBoundingClientRect().top;
+    const screenPosition = window.innerHeight / 1.2;
+    if(position < screenPosition){
+      el.style.opacity = "1";
+      el.style.transform = "translateY(0)";
+    }
+  });
+}
+
+window.addEventListener("scroll", () => {
+  showProjects();
+  showScripts();
+});
+showProjects();
+showScripts();
+
+/* Gradient reagujący na ruch kursora - KOLOROWE */
+document.addEventListener("mousemove", e => {
+  const xPercent = (e.clientX / window.innerWidth) * 100;
+  const yPercent = (e.clientY / window.innerHeight) * 100;
+  document.body.style.backgroundPosition = `${xPercent}% ${yPercent}%`;
+});
+
+/* Nawigacja - zaznaczanie aktywnego linku */
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', function(e) {
+    e.preventDefault();
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    this.classList.add('active');
+    const targetId = this.getAttribute('href');
+    document.querySelector(targetId).scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+/* Smooth scroll na przyciskach */
+document.querySelectorAll('a[href^="#"]').forEach(link => {
+  link.addEventListener('click', function(e) {
+    const targetId = this.getAttribute('href');
+    if(targetId && targetId !== '#') {
+      e.preventDefault();
+      const target = document.querySelector(targetId);
+      if(target) {
+        target.scrollIntoView({ behavior: 'smooth' });
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        const activeLink = document.querySelector(`a[href="${targetId}"]`);
+        if(activeLink && activeLink.classList.contains('nav-link')) {
+          activeLink.classList.add('active');
+        }
+      }
+    }
+  });
+});
+
+// Funkcje do pobierania i wyświetlania projektów z localStorage
+function getProjectsFromStorage() {
+  const data = localStorage.getItem('projects');
+  return data ? JSON.parse(data) : [];
+}
+
+function renderProjects() {
+  const projects = getProjectsFromStorage();
+  const container = document.getElementById('projectsContainer');
+
+  if(!container) return;
+
+  if(projects.length === 0) {
+    container.innerHTML = '<div class="project" style="background: rgba(0,0,0,0.3); border: 2px dashed rgba(255,107,53,0.4);">\n      <h3>Brak projektów</h3>\n      <p>Dodaj projekty w panelu admina.</p>\n      </div>';
+    return;
+  }
+
+  container.innerHTML = projects.map((project, index) => `\n    <div class="project" style="animation: fadeInUp 0.5s ease-out ${0.1 * index}s both;">\n      <h3>${project.emoji || '📌'} ${project.name}</h3>\n      <p>${project.desc}</p>\n      ${project.link ? `<a class="btn" href="${project.link}" target="_blank">Dowiedz się więcej</a>` : ''}\n    </div>\n  `).join('');
+}
+
+// Inicjalizacja projektów przy wczytaniu strony
+document.addEventListener('DOMContentLoaded', () => {
+  renderProjects();
+});
+
+const themeToggle = document.getElementById('theme-toggle');
+const themeWipe = document.getElementById('theme-wipe');
+
+function setTheme(dark) {
+  if (dark) {
+    document.body.classList.add('dark-mode');
+    themeToggle.textContent = '☀️';
+    localStorage.setItem('theme', 'dark');
+  } else {
+    document.body.classList.remove('dark-mode');
+    themeToggle.textContent = '🌙';
+    localStorage.setItem('theme', 'light');
+  }
+}
+
+function initTheme() {
+  const theme = localStorage.getItem('theme');
+  setTheme(theme === 'dark');
+}
+
+themeToggle.addEventListener('click', () => {
+  const toDark = !document.body.classList.contains('dark-mode');
+  themeWipe.classList.remove('slide-to-dark', 'slide-to-light');
+  themeWipe.classList.add(toDark ? 'slide-to-dark' : 'slide-to-light');
+
+  setTimeout(() => {
+    setTheme(toDark);
+  }, 250);
+
+  themeWipe.addEventListener('animationend', () => {
+    themeWipe.classList.remove('slide-to-dark', 'slide-to-light');
+  }, { once: true });
+});
+
+document.addEventListener('DOMContentLoaded', initTheme);
+</script>
+
+</body>
+</html>

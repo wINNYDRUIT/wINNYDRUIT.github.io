@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel - Grzesiu APPs</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+  // TODO: Replace with your Firebase config
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.db = db;
+  window.collection = collection;
+  window.addDoc = addDoc;
+  window.getDocs = getDocs;
+  window.doc = doc;
+  window.updateDoc = updateDoc;
+  window.deleteDoc = deleteDoc;
+</script>
+
+<style>
+html{
+scroll-behavior:smooth;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Inter',sans-serif;
+}
+
+:root {
+  --bg: linear-gradient(-45deg,#ff4500,#ff6347,#ffb347,#ff8c00);
+  --text: #000;
+  --header-bg: linear-gradient(-45deg,#ff4500,#ff6347,#ffb347,#ff8c00);
+  --logo-admin: #ff6b35;
+  --logout-bg: #d32f2f;
+  --logout-hover: #ff4444;
+  --login-bg: rgba(255,255,255,0.9);
+  --login-border: rgba(255,107,53,0.5);
+  --login-h2: #ff6b35;
+  --form-label: #333;
+  --form-input-bg: rgba(255,255,255,0.9);
+  --form-input-border: rgba(255,107,53,0.3);
+  --form-input-focus-bg: rgba(255,255,255,1);
+  --form-input-focus-border: rgba(255,107,53,0.8);
+  --login-btn-bg: #ff4500;
+  --login-btn-hover: #ff5c1a;
+  --error-bg: rgba(255, 0, 0, 0.2);
+  --error-border: rgba(255, 0, 0, 0.5);
+  --error-color: #d32f2f;
+  --section-title: #ff6b35;
+  --add-project-bg: rgba(255,255,255,0.9);
+  --add-project-border: rgba(255,107,53,0.3);
+  --form-admin-label: #333;
+  --form-admin-input-bg: rgba(255,255,255,0.9);
+  --form-admin-input-border: rgba(255,107,53,0.3);
+  --form-admin-input-focus-bg: rgba(255,255,255,1);
+  --form-admin-input-focus-border: rgba(255,107,53,0.8);
+  --add-btn-bg: #4CAF50;
+  --add-btn-hover: #45a049;
+  --project-item-bg: rgba(255,255,255,0.9);
+  --project-item-border: rgba(255,107,53,0.3);
+  --project-item-hover-border: rgba(255,179,71,0.8);
+  --project-item-h4: #ff6b35;
+  --project-item-p: #333;
+  --edit-btn-bg: #2196F3;
+  --edit-btn-hover: #0b7dda;
+  --delete-btn-bg: #d32f2f;
+  --delete-btn-hover: #ff4444;
+  --empty-state: #333;
+  --success-bg: rgba(76, 175, 80, 0.2);
+  --success-border: rgba(76, 175, 80, 0.5);
+  --success-color: #4CAF50;
+}
+
+.dark-mode {
+  --bg: linear-gradient(-45deg, #040404, #0b1a2b, #10171f, #020405);
+  --text: #e8f3ff;
+  --header-bg: rgba(0, 0, 0, 0.65);
+  --logo-admin: #32cd32;
+  --logout-bg: #b30000;
+  --logout-hover: #ff4444;
+  --login-bg: rgba(0, 0, 0, 0.7);
+  --login-border: rgba(0, 120, 0, 0.8);
+  --login-h2: #32cd32;
+  --form-label: #90ee90;
+  --form-input-bg: rgba(0,100,0,0.1);
+  --form-input-border: rgba(0,100,0,0.3);
+  --form-input-focus-bg: rgba(0,100,0,0.2);
+  --form-input-focus-border: rgba(0,100,0,0.8);
+  --login-btn-bg: #006400;
+  --login-btn-hover: #32cd32;
+  --error-bg: rgba(255, 0, 0, 0.2);
+  --error-border: rgba(255, 0, 0, 0.5);
+  --error-color: #ff6b6b;
+  --section-title: #006400;
+  --add-project-bg: rgba(0, 0, 0, 0.4);
+  --add-project-border: rgba(0,100,0,0.3);
+  --form-admin-label: #90ee90;
+  --form-admin-input-bg: rgba(0,100,0,0.1);
+  --form-admin-input-border: rgba(0,100,0,0.3);
+  --form-admin-input-focus-bg: rgba(0,100,0,0.2);
+  --form-admin-input-focus-border: rgba(0,100,0,0.8);
+  --add-btn-bg: #4CAF50;
+  --add-btn-hover: #45a049;
+  --project-item-bg: rgba(0, 0, 0, 0.4);
+  --project-item-border: rgba(0,100,0,0.3);
+  --project-item-hover-border: rgba(50,205,50,0.8);
+  --project-item-h4: #006400;
+  --project-item-p: #90ee90;
+  --edit-btn-bg: #2196F3;
+  --edit-btn-hover: #0b7dda;
+  --delete-btn-bg: #d32f2f;
+  --delete-btn-hover: #ff4444;
+  --empty-state: #90ee90;
+  --success-bg: rgba(76, 175, 80, 0.2);
+  --success-border: rgba(76, 175, 80, 0.5);
+  --success-color: #90EE90;
+}
+
+body{
+color:var(--text);
+background: var(--bg);
+background-size:400% 400%;
+transition: background-position 0.05s ease-out;
+min-height: 100vh;
+}
+
+.theme-wipe {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  pointer-events: none;
+  z-index: 9999;
+  transform: translateX(-100%);
+}
+
+.theme-wipe.slide-to-dark {
+  animation: wipe-right 0.5s ease forwards;
+}
+
+.theme-wipe.slide-to-light {
+  animation: wipe-left 0.5s ease forwards;
+}
+
+@keyframes wipe-right {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(0); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes wipe-left {
+  0% { transform: translateX(100%); }
+  50% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+/* LOGIN PAGE */
+.login-container{
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0, 0, 0, 0.8);
+backdrop-filter: blur(5px);
+display: none;
+justify-content: center;
+align-items: center;
+z-index: 1000;
+opacity: 0;
+transition: opacity 0.4s ease;
+}
+
+.login-container.active{
+display: flex;
+opacity: 1;
+}
+
+.login-box{
+background: var(--login-bg);
+backdrop-filter: blur(10px);
+border: 2px solid var(--login-border);
+border-radius: 15px;
+padding: 50px;
+max-width: 400px;
+width: 100%;
+animation: slideUp 0.6s ease-out;
+transform-origin: center;
+}
+
+.login-box.shake{
+animation: shake 0.5s ease-in-out;
+}
+
+.login-box.fadeOut{
+animation: fadeOut 0.4s ease-out forwards;
+}
+
+.login-box h2{
+font-size: 2rem;
+margin-bottom: 30px;
+text-align: center;
+color: var(--login-h2);
+}
+
+.form-group{
+margin-bottom: 20px;
+}
+
+.form-group label{
+display: block;
+margin-bottom: 8px;
+color: var(--form-label);
+font-weight: 600;
+}
+
+.form-group input{
+width: 100%;
+padding: 12px;
+background: var(--form-input-bg);
+border: 1px solid var(--form-input-border);
+border-radius: 8px;
+color: var(--text);
+font-size: 1rem;
+transition: all 0.3s ease;
+}
+
+.form-group input:focus{
+outline: none;
+background: var(--form-input-focus-bg);
+border-color: var(--form-input-focus-border);
+box-shadow: 0 0 15px rgba(255, 107, 53, 0.4);
+}
+
+.form-group input::placeholder{
+color: rgba(255, 255, 255, 0.5);
+}
+
+.login-btn{
+width: 100%;
+padding: 14px;
+background: var(--login-btn-bg);
+border: none;
+border-radius: 8px;
+color: white;
+font-weight: 600;
+font-size: 1rem;
+cursor: pointer;
+transition: all 0.3s ease;
+margin-top: 10px;
+}
+
+.login-btn:hover{
+background: var(--login-btn-hover);
+box-shadow: 0 0 30px rgba(255, 69, 0, 0.6);
+transform: scale(1.02);
+}
+
+.error-msg{
+background: var(--error-bg);
+border: 1px solid var(--error-border);
+color: var(--error-color);
+padding: 12px;
+border-radius: 8px;
+margin-bottom: 20px;
+display: none;
+}
+
+.error-msg.show{
+display: block;
+}
+
+/* ADMIN PANEL */
+.admin-container{
+display: none;
+padding: 20px;
+opacity: 0;
+transition: opacity 0.4s ease;
+}
+
+.admin-container.active{
+display: block;
+opacity: 1;
+}
+
+header{
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 20px;
+backdrop-filter: blur(8px);
+background: var(--bg);
+border-bottom: 1px solid rgba(255, 107, 53, 0.3);
+border-radius: 10px;
+margin-bottom: 30px;
+animation: slideDown 0.6s ease-out;
+}
+
+.logo-admin{
+font-size: 20px;
+font-weight: 700;
+color: var(--logo-admin);
+}
+
+.logout-btn{
+padding: 10px 20px;
+background: var(--logout-bg);
+border: none;
+border-radius: 8px;
+color: white;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.3s ease;
+}
+
+.logout-btn:hover{
+background: var(--logout-hover);
+box-shadow: 0 0 20px rgba(211, 47, 47, 0.6);
+}
+
+.admin-content{
+max-width: 1200px;
+margin: 0 auto;
+animation: fadeInUp 0.6s ease-out 0.2s both;
+}
+
+.section-title{
+font-size: 2rem;
+color: var(--section-title);
+margin-bottom: 30px;
+margin-top: 40px;
+}
+
+.add-project-form{
+background: var(--add-project-bg);
+border: 2px solid var(--add-project-border);
+border-radius: 15px;
+padding: 30px;
+margin-bottom: 40px;
+backdrop-filter: blur(10px);
+}
+
+.form-row{
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 20px;
+margin-bottom: 20px;
+}
+
+.form-row.full{
+grid-template-columns: 1fr;
+}
+
+.form-group-admin{
+display: flex;
+flex-direction: column;
+}
+
+.form-group-admin label{
+margin-bottom: 8px;
+color: var(--form-admin-label);
+font-weight: 600;
+}
+
+.form-group-admin input,
+.form-group-admin textarea{
+padding: 12px;
+background: var(--form-admin-input-bg);
+border: 1px solid var(--form-admin-input-border);
+border-radius: 8px;
+color: var(--text);
+font-size: 1rem;
+font-family: 'Inter', sans-serif;
+transition: all 0.3s ease;
+}
+
+.form-group-admin textarea{
+resize: vertical;
+min-height: 100px;
+}
+
+.form-group-admin input:focus,
+.form-group-admin textarea:focus{
+outline: none;
+background: var(--form-admin-input-focus-bg);
+border-color: var(--form-admin-input-focus-border);
+box-shadow: 0 0 15px rgba(255, 107, 53, 0.4);
+}
+
+.add-btn{
+padding: 14px 30px;
+background: var(--add-btn-bg);
+border: none;
+border-radius: 8px;
+color: white;
+font-weight: 600;
+font-size: 1rem;
+cursor: pointer;
+transition: all 0.3s ease;
+margin-top: 10px;
+}
+
+.add-btn:hover{
+background: var(--add-btn-hover);
+box-shadow: 0 0 30px rgba(76, 175, 80, 0.6);
+transform: scale(1.02);
+}
+
+.projects-list{
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+gap: 25px;
+}
+
+.project-item{
+background: var(--project-item-bg);
+border: 2px solid var(--project-item-border);
+border-radius: 15px;
+padding: 25px;
+backdrop-filter: blur(10px);
+transition: all 0.3s ease;
+}
+
+.project-item:hover{
+transform: translateY(-5px);
+border-color: var(--project-item-hover-border);
+box-shadow: 0 10px 40px rgba(255, 107, 53, 0.3);
+}
+
+.project-item h4{
+color: var(--project-item-h4);
+margin-bottom: 10px;
+font-size: 1.3rem;
+}
+
+.project-item p{
+color: var(--project-item-p);
+margin-bottom: 15px;
+font-size: 0.95rem;
+}
+
+.project-actions{
+display: flex;
+gap: 10px;
+}
+
+.edit-btn, .delete-btn{
+padding: 8px 15px;
+border: none;
+border-radius: 6px;
+cursor: pointer;
+font-weight: 600;
+transition: all 0.3s ease;
+flex: 1;
+}
+
+.edit-btn{
+background: var(--edit-btn-bg);
+color: white;
+}
+
+.edit-btn:hover{
+background: var(--edit-btn-hover);
+box-shadow: 0 0 15px rgba(33, 150, 243, 0.6);
+}
+
+.delete-btn{
+background: var(--delete-btn-bg);
+color: white;
+}
+
+.delete-btn:hover{
+background: var(--delete-btn-hover);
+box-shadow: 0 0 15px rgba(211, 47, 47, 0.6);
+}
+
+.empty-state{
+text-align: center;
+padding: 60px 20px;
+color: var(--empty-state);
+font-size: 1.1rem;
+}
+
+.success-msg{
+background: var(--success-bg);
+border: 1px solid var(--success-border);
+color: var(--success-color);
+padding: 12px;
+border-radius: 8px;
+margin-bottom: 20px;
+display: none;
+}
+
+.success-msg.show{
+display: block;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: scale(0.8) translateY(-50px);
+        opacity: 0;
+    }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+    20%, 40%, 60%, 80% { transform: translateX(10px); }
+}
+
+</style>
+
+</head>
+
+<body>
+<div id="theme-wipe" class="theme-wipe"></div>
+
+<!-- LOGIN PAGE -->
+<div class="login-container active" id="loginContainer">
+<div class="login-box">
+<h2>🔐 Admin Login</h2>
+<div class="error-msg" id="errorMsg"></div>
+<div class="form-group">
+<label>Login:</label>
+<input type="text" id="username" placeholder="Wpisz login" autocomplete="off">
+</div>
+<div class="form-group">
+<label>Hasło:</label>
+<input type="password" id="password" placeholder="Wpisz hasło">
+</div>
+<button class="login-btn" onclick="login()">Zaloguj się</button>
+<p style="text-align: center; margin-top: 20px; color: #d0a080; font-size: 0.85rem;">
+Demo: login: <strong>admin</strong> | hasło: <strong>admin123</strong>
+</p>
+</div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="admin-container" id="adminContainer">
+<header>
+<a class="logo-admin" href="index.html">⚡ Admin Panel - Grzesiu APPs</a>
+<div>
+<button class="logout-btn" onclick="logout()">Wyloguj się</button>
+<button id="theme-toggle" style="margin-left:10px; background:none; border:none; color:var(--form-label); font-size:20px; cursor:pointer;">🌙</button>
+</div>
+</header>
+
+<div class="admin-content">
+<!-- ADD PROJECT SECTION -->
+<div class="section-title">➕ Dodaj Nowy Projekt</div>
+
+<div class="add-project-form">
+<div class="success-msg" id="successMsg"></div>
+
+<div class="form-row">
+<div class="form-group-admin">
+<label>Emoji / Ikona:</label>
+<input type="text" id="projectEmoji" placeholder="np. 🚀" value="🚀" maxlength="2">
+</div>
+<div class="form-group-admin">
+<label>Nazwa Projektu:</label>
+<input type="text" id="projectName" placeholder="np. Projekt 1">
+</div>
+</div>
+
+<div class="form-row full">
+<div class="form-group-admin">
+<label>Opis:</label>
+<textarea id="projectDesc" placeholder="Wpisz opis projektu"></textarea>
+</div>
+</div>
+
+<div class="form-row">
+<div class="form-group-admin">
+<label>Link (opcjonalnie):</label>
+<input type="text" id="projectLink" placeholder="https://...">
+</div>
+</div>
+
+<button class="add-btn" onclick="addProject()">Dodaj Projekt</button>
+</div>
+
+<!-- PROJECTS LIST -->
+<div class="section-title">📋 Twoje Projekty</div>
+<div class="projects-list" id="projectsList">
+<div class="empty-state">Brak projektów. Dodaj swój pierwszy projekt!</div>
+</div>
+
+<!-- SCRIPTS SECTION -->
+<div class="section-title">💻 Zarządzanie Skryptami</div>
+<div class="add-project-form" style="padding-top: 20px;">
+<div class="success-msg" id="scriptSuccessMsg"></div>
+
+<div class="form-row">
+<div class="form-group-admin">
+<label>Nazwa skryptu:</label>
+<input type="text" id="scriptName" placeholder="np. Auto-fill form">
+</div>
+<div class="form-group-admin">
+<label>Opis skryptu:</label>
+<input type="text" id="scriptDesc" placeholder="Krótki opis">
+</div>
+</div>
+
+<div class="form-row full">
+<div class="form-group-admin">
+<label>Treść skryptu (JS):</label>
+<textarea id="scriptCode" placeholder="np. function test(){...}"></textarea>
+</div>
+</div>
+
+<button class="add-btn" onclick="addScript()">Dodaj Skrypt</button>
+</div>
+
+<div class="section-title">📄 Twoje Skrypty</div>
+<div class="projects-list" id="scriptsList">
+<div class="empty-state">Brak skryptów. Dodaj swój pierwszy skrypt!</div>
+</div>
+
+</div>
+</div>
+
+<script>
+// Dane testowe
+const ADMIN_USER = 'admin';
+const ADMIN_PASS = 'admin123';
+
+// Inicjalizacja
+document.addEventListener('DOMContentLoaded', async function() {
+  checkLoginStatus();
+  await loadProjects();
+  await loadScripts();
+  
+  // Enter w polu hasła
+  document.getElementById('password').addEventListener('keypress', function(e) {
+    if(e.key === 'Enter') login();
+  });
+});
+
+// LOGIN FUNCTION
+function login() {
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  const errorMsg = document.getElementById('errorMsg');
+  
+  if(!username || !password) {
+    showError('Wpisz login i hasło!');
+    return;
+  }
+  
+  if(username === ADMIN_USER && password === ADMIN_PASS) {
+    localStorage.setItem('adminLogged', 'true');
+    showAdminPanel();
+    clearLoginForms();
+  } else {
+    showError('Błędny login lub hasło!');
+    document.getElementById('password').value = '';
+  }
+}
+
+function showError(msg) {
+  const errorMsg = document.getElementById('errorMsg');
+  const loginBox = document.querySelector('.login-box');
+  
+  errorMsg.textContent = msg;
+  errorMsg.classList.add('show');
+  
+  // Potrząsanie box'a
+  loginBox.classList.add('shake');
+  setTimeout(() => {
+    loginBox.classList.remove('shake');
+  }, 500);
+  
+  setTimeout(() => {
+    errorMsg.classList.remove('show');
+  }, 3000);
+}
+
+function showSuccess(msg) {
+  const successMsg = document.getElementById('successMsg');
+  successMsg.textContent = msg;
+  successMsg.classList.add('show');
+  setTimeout(() => {
+    successMsg.classList.remove('show');
+  }, 3000);
+}
+
+// LOGOUT FUNCTION
+function logout() {
+  localStorage.removeItem('adminLogged');
+  showLoginPage();
+  clearLoginForms();
+}
+
+// Eksport projektów do pliku JSON
+function downloadProjectsFile() {
+  const projects = getProjects();
+  const dataStr = JSON.stringify(projects, null, 2);
+  const blob = new Blob([dataStr], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'projects.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// CHECK LOGIN STATUS
+function checkLoginStatus() {
+  if(localStorage.getItem('adminLogged') === 'true') {
+    showAdminPanel();
+  } else {
+    showLoginPage();
+  }
+}
+
+function showLoginPage() {
+  const loginContainer = document.getElementById('loginContainer');
+  const adminContainer = document.getElementById('adminContainer');
+  
+  adminContainer.classList.remove('active');
+  
+  setTimeout(() => {
+    loginContainer.classList.add('active');
+  }, 100);
+}
+
+function showAdminPanel() {
+  const loginBox = document.querySelector('.login-box');
+  const loginContainer = document.getElementById('loginContainer');
+  const adminContainer = document.getElementById('adminContainer');
+  
+  loginBox.classList.add('fadeOut');
+  
+  setTimeout(() => {
+    loginContainer.classList.remove('active');
+    adminContainer.classList.add('active');
+    loginBox.classList.remove('fadeOut');
+  }, 400);
+}
+
+function clearLoginForms() {
+  document.getElementById('username').value = '';
+  document.getElementById('password').value = '';
+}
+
+// ADD PROJECT
+// ADD PROJECT
+async function addProject() {
+  const emoji = document.getElementById('projectEmoji').value || '📌';
+  const name = document.getElementById('projectName').value.trim();
+  const desc = document.getElementById('projectDesc').value.trim();
+  const link = document.getElementById('projectLink').value.trim();
+  
+  if(!name || !desc) {
+    showError('Wpisz nazwę i opis projektu!');
+    return;
+  }
+  
+  try {
+    await addDoc(collection(db, "projects"), {
+      emoji,
+      name,
+      desc,
+      link,
+      date: new Date().toLocaleDateString('pl-PL')
+    });
+    
+    // Clear form
+    document.getElementById('projectEmoji').value = '🚀';
+    document.getElementById('projectName').value = '';
+    document.getElementById('projectDesc').value = '';
+    document.getElementById('projectLink').value = '';
+    
+    showSuccess('✅ Projekt został dodany!');
+    loadProjects();
+  } catch (error) {
+    console.error("Error adding project: ", error);
+    showError('Błąd podczas dodawania projektu!');
+  }
+}
+
+// SCRIPTS HANDLERS
+async function getScripts() {
+  try {
+    const querySnapshot = await getDocs(collection(db, "scripts"));
+    const scripts = [];
+    querySnapshot.forEach((doc) => {
+      scripts.push({ id: doc.id, ...doc.data() });
+    });
+    return scripts;
+  } catch (error) {
+    console.error("Error getting scripts: ", error);
+    return [];
+  }
+}
+
+async function loadScripts() {
+  const scripts = await getScripts();
+  const list = document.getElementById('scriptsList');
+  if(!list) return;
+
+  if(scripts.length === 0) {
+    list.innerHTML = '<div class="empty-state">Brak skryptów. Dodaj swój pierwszy skrypt!</div>';
+    return;
+  }
+
+  list.innerHTML = scripts.map(script => `
+    <div class="project-item">
+      <h4>🛠 ${script.name}</h4>
+      <p>${script.desc}</p>
+      <pre style="background: rgba(0,0,0,0.6); border-radius: 8px; padding: 12px; white-space: pre-wrap;">${escapeHtml(script.code)}</pre>
+      <div class="project-actions">
+        <button class="edit-btn" onclick="editScript('${script.id}')">✏️ Edytuj</button>
+        <button class="delete-btn" onclick="deleteScript('${script.id}')">🗑️ Usuń</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function addScript() {
+  const name = document.getElementById('scriptName').value.trim();
+  const desc = document.getElementById('scriptDesc').value.trim();
+  const code = document.getElementById('scriptCode').value.trim();
+
+  if(!name || !desc || !code) {
+    showError('Wypełnij wszystkie pola skryptu!');
+    return;
+  }
+
+  try {
+    await addDoc(collection(db, "scripts"), {
+      name,
+      desc,
+      code,
+      date: new Date().toLocaleDateString('pl-PL')
+    });
+
+    document.getElementById('scriptName').value = '';
+    document.getElementById('scriptDesc').value = '';
+    document.getElementById('scriptCode').value = '';
+
+    const scriptSuccess = document.getElementById('scriptSuccessMsg');
+    scriptSuccess.textContent = '✅ Skrypt został dodany!';
+    scriptSuccess.classList.add('show');
+    setTimeout(() => scriptSuccess.classList.remove('show'), 3000);
+
+    loadScripts();
+  } catch (error) {
+    console.error("Error adding script: ", error);
+    showError('Błąd podczas dodawania skryptu!');
+  }
+}
+
+async function editScript(id) {
+  try {
+    const scripts = await getScripts();
+    const script = scripts.find(s => s.id === id);
+    if(!script) return;
+    document.getElementById('scriptName').value = script.name;
+    document.getElementById('scriptDesc').value = script.desc;
+    document.getElementById('scriptCode').value = script.code;
+    await deleteScript(id, false);
+  } catch (error) {
+    console.error("Error editing script: ", error);
+  }
+}
+
+async function deleteScript(id, showMsg = true) {
+  try {
+    await deleteDoc(doc(db, "scripts", id));
+    if(showMsg) showSuccess('✅ Skrypt został usunięty!');
+    loadScripts();
+  } catch (error) {
+    console.error("Error deleting script: ", error);
+    showError('Błąd podczas usuwania skryptu!');
+  }
+}
+
+function saveScriptsFile() {
+  const scripts = getScripts();
+  const dataStr = JSON.stringify(scripts, null, 2);
+  const blob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'scripts.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function escapeHtml(text) {
+  const p = document.createElement('p');
+  p.textContent = text;
+  return p.innerHTML;
+}
+
+// GET PROJECTS
+async function getProjects() {
+  try {
+    const querySnapshot = await getDocs(collection(db, "projects"));
+    const projects = [];
+    querySnapshot.forEach((doc) => {
+      projects.push({ id: doc.id, ...doc.data() });
+    });
+    return projects;
+  } catch (error) {
+    console.error("Error getting projects: ", error);
+    return [];
+  }
+}
+
+// LOAD PROJECTS
+async function loadProjects() {
+  const projects = await getProjects();
+  const list = document.getElementById('projectsList');
+  
+  if(projects.length === 0) {
+    list.innerHTML = '<div class="empty-state">Brak projektów. Dodaj swój pierwszy projekt!</div>';
+    return;
+  }
+  
+  list.innerHTML = projects.map(project => `
+    <div class="project-item">
+      <h4>${project.emoji} ${project.name}</h4>
+      <p>${project.desc}</p>
+      <p style="font-size: 0.85rem; color: #888; margin-bottom: 15px;">Dodano: ${project.date}</p>
+      ${project.link ? `<p><a href="${project.link}" target="_blank" style="color: #ff6b35; text-decoration: none;">🔗 Otwórz Link</a></p>` : ''}
+      <div class="project-actions">
+        <button class="edit-btn" onclick="editProject('${project.id}')">✏️ Edytuj</button>
+        <button class="delete-btn" onclick="deleteProject('${project.id}')">🗑️ Usuń</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// EDIT PROJECT
+async function editProject(id) {
+  try {
+    const projects = await getProjects();
+    const project = projects.find(p => p.id === id);
+    
+    if(!project) return;
+    
+    document.getElementById('projectEmoji').value = project.emoji;
+    document.getElementById('projectName').value = project.name;
+    document.getElementById('projectDesc').value = project.desc;
+    document.getElementById('projectLink').value = project.link || '';
+    
+    document.querySelector('.add-project-form').scrollIntoView({ behavior: 'smooth' });
+    
+    await deleteProject(id, false);
+  } catch (error) {
+    console.error("Error editing project: ", error);
+  }
+}
+
+// DELETE PROJECT
+// DELETE PROJECT
+async function deleteProject(id, showMsg = true) {
+  if(!showMsg || confirm('Na pewno chcesz usunąć ten projekt?')) {
+    try {
+      await deleteDoc(doc(db, "projects", id));
+      
+      if(showMsg) showSuccess('✅ Projekt został usunięty!');
+      loadProjects();
+    } catch (error) {
+      console.error("Error deleting project: ", error);
+      showError('Błąd podczas usuwania projektu!');
+    }
+  }
+}
+
+// Gradient z kursorem
+document.addEventListener('mousemove', e => {
+  const xPercent = (e.clientX / window.innerWidth) * 100;
+  const yPercent = (e.clientY / window.innerHeight) * 100;
+  document.body.style.backgroundPosition = `${xPercent}% ${yPercent}%`;
+});
+
+const themeToggle = document.getElementById('theme-toggle');
+const themeWipe = document.getElementById('theme-wipe');
+
+function setTheme(dark) {
+  if (dark) {
+    document.body.classList.add('dark-mode');
+    themeToggle.textContent = '☀️';
+    localStorage.setItem('theme', 'dark');
+  } else {
+    document.body.classList.remove('dark-mode');
+    themeToggle.textContent = '🌙';
+    localStorage.setItem('theme', 'light');
+  }
+}
+
+function initTheme() {
+  const theme = localStorage.getItem('theme');
+  setTheme(theme === 'dark');
+}
+
+themeToggle.addEventListener('click', () => {
+  const toDark = !document.body.classList.contains('dark-mode');
+  themeWipe.classList.remove('slide-to-dark', 'slide-to-light');
+  themeWipe.classList.add(toDark ? 'slide-to-dark' : 'slide-to-light');
+
+  setTimeout(() => {
+    setTheme(toDark);
+  }, 250);
+
+  themeWipe.addEventListener('animationend', () => {
+    themeWipe.classList.remove('slide-to-dark', 'slide-to-light');
+  }, { once: true });
+});
+
+document.addEventListener('DOMContentLoaded', initTheme);
+</script>
+
+</body>
+</html>
