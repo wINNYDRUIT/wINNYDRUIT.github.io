@@ -9,30 +9,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <!-- Firebase SDK -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-
-  // TODO: Replace with your Firebase config
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  window.db = db;
-  window.collection = collection;
-  window.addDoc = addDoc;
-  window.getDocs = getDocs;
-  window.doc = doc;
-  window.updateDoc = updateDoc;
-  window.deleteDoc = deleteDoc;
+<script>
+  // Usunięto Firebase - teraz używamy localStorage dla lokalnego przechowywania danych
 </script>
 
 <style>
@@ -608,6 +586,7 @@ Demo: login: <strong>admin</strong> | hasło: <strong>admin123</strong>
 
 <div class="add-project-form">
 <div class="success-msg" id="successMsg"></div>
+<input type="hidden" id="editId" value="">
 
 <div class="form-row">
 <div class="form-group-admin">
@@ -643,10 +622,13 @@ Demo: login: <strong>admin</strong> | hasło: <strong>admin123</strong>
 <div class="empty-state">Brak projektów. Dodaj swój pierwszy projekt!</div>
 </div>
 
+<button class="add-btn" onclick="downloadProjectsFile()" style="margin-top: 20px;">Eksportuj Projekty do JSON</button>
+
 <!-- SCRIPTS SECTION -->
 <div class="section-title">💻 Zarządzanie Skryptami</div>
 <div class="add-project-form" style="padding-top: 20px;">
 <div class="success-msg" id="scriptSuccessMsg"></div>
+<input type="hidden" id="editScriptId" value="">
 
 <div class="form-row">
 <div class="form-group-admin">
@@ -654,8 +636,8 @@ Demo: login: <strong>admin</strong> | hasło: <strong>admin123</strong>
 <input type="text" id="scriptName" placeholder="np. Auto-fill form">
 </div>
 <div class="form-group-admin">
-<label>Opis skryptu:</label>
-<input type="text" id="scriptDesc" placeholder="Krótki opis">
+<label>Nazwa pliku (bez .html):</label>
+<input type="text" id="scriptFile" placeholder="np. auto-fill-form">
 </div>
 </div>
 
@@ -674,6 +656,8 @@ Demo: login: <strong>admin</strong> | hasło: <strong>admin123</strong>
 <div class="empty-state">Brak skryptów. Dodaj swój pierwszy skrypt!</div>
 </div>
 
+<button class="add-btn" onclick="saveScriptsFile()" style="margin-top: 20px;">Eksportuj Skrypty do JSON</button>
+
 </div>
 </div>
 
@@ -685,8 +669,8 @@ const ADMIN_PASS = 'admin123';
 // Inicjalizacja
 document.addEventListener('DOMContentLoaded', async function() {
   checkLoginStatus();
-  await loadProjects();
-  await loadScripts();
+  loadProjects();
+  loadScripts();
   
   // Enter w polu hasła
   document.getElementById('password').addEventListener('keypress', function(e) {
@@ -750,16 +734,38 @@ function logout() {
 }
 
 // Eksport projektów do pliku JSON
-function downloadProjectsFile() {
-  const projects = getProjects();
-  const dataStr = JSON.stringify(projects, null, 2);
-  const blob = new Blob([dataStr], {type: 'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'projects.json';
-  a.click();
-  URL.revokeObjectURL(url);
+async function downloadProjectsFile() {
+  try {
+    const projects = getProjects();
+    const data = JSON.stringify(projects, null, 2);
+    const blob = new Blob([data], {type: 'application/json'});
+
+    if ('showSaveFilePicker' in window) {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: 'projects.json',
+        types: [{
+          description: 'JSON file',
+          accept: {'application/json': ['.json']}
+        }]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+      showSuccess('✅ Plik projects.json został zapisany!');
+    } else {
+      // Fallback to download
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'projects.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      showSuccess('✅ Plik projects.json został pobrany!');
+    }
+  } catch (error) {
+    console.error('Error saving file:', error);
+    showError('Błąd podczas zapisywania pliku!');
+  }
 }
 
 // CHECK LOGIN STATUS
@@ -802,58 +808,63 @@ function clearLoginForms() {
 }
 
 // ADD PROJECT
-// ADD PROJECT
-async function addProject() {
+function addProject() {
   const emoji = document.getElementById('projectEmoji').value || '📌';
   const name = document.getElementById('projectName').value.trim();
   const desc = document.getElementById('projectDesc').value.trim();
   const link = document.getElementById('projectLink').value.trim();
+  const editId = document.getElementById('editId').value;
   
   if(!name || !desc) {
     showError('Wpisz nazwę i opis projektu!');
     return;
   }
   
-  try {
-    await addDoc(collection(db, "projects"), {
+  const projects = getProjects();
+  
+  if(editId) {
+    // Edit existing
+    const project = projects.find(p => p.id === editId);
+    if(project) {
+      project.emoji = emoji;
+      project.name = name;
+      project.desc = desc;
+      project.link = link;
+    }
+    document.getElementById('editId').value = '';
+  } else {
+    // Add new
+    const newProject = {
+      id: Date.now().toString(),
       emoji,
       name,
       desc,
       link,
       date: new Date().toLocaleDateString('pl-PL')
-    });
-    
-    // Clear form
-    document.getElementById('projectEmoji').value = '🚀';
-    document.getElementById('projectName').value = '';
-    document.getElementById('projectDesc').value = '';
-    document.getElementById('projectLink').value = '';
-    
-    showSuccess('✅ Projekt został dodany!');
-    loadProjects();
-  } catch (error) {
-    console.error("Error adding project: ", error);
-    showError('Błąd podczas dodawania projektu!');
+    };
+    projects.push(newProject);
   }
+  
+  localStorage.setItem('projects', JSON.stringify(projects));
+  
+  // Clear form
+  document.getElementById('projectEmoji').value = '🚀';
+  document.getElementById('projectName').value = '';
+  document.getElementById('projectDesc').value = '';
+  document.getElementById('projectLink').value = '';
+  
+  showSuccess(editId ? '✅ Projekt został zaktualizowany!' : '✅ Projekt został dodany!');
+  loadProjects();
+  downloadProjectsFile();  // Zapisz plik po dodaniu
 }
 
 // SCRIPTS HANDLERS
-async function getScripts() {
-  try {
-    const querySnapshot = await getDocs(collection(db, "scripts"));
-    const scripts = [];
-    querySnapshot.forEach((doc) => {
-      scripts.push({ id: doc.id, ...doc.data() });
-    });
-    return scripts;
-  } catch (error) {
-    console.error("Error getting scripts: ", error);
-    return [];
-  }
+function getScripts() {
+  return JSON.parse(localStorage.getItem('scripts')) || [];
 }
 
-async function loadScripts() {
-  const scripts = await getScripts();
+function loadScripts() {
+  const scripts = getScripts();
   const list = document.getElementById('scriptsList');
   if(!list) return;
 
@@ -864,112 +875,144 @@ async function loadScripts() {
 
   list.innerHTML = scripts.map(script => `
     <div class="project-item">
-      <h4>🛠 ${script.name}</h4>
+      <h4>🛠 ${script.name} (${script.file}.html)</h4>
       <p>${script.desc}</p>
       <pre style="background: rgba(0,0,0,0.6); border-radius: 8px; padding: 12px; white-space: pre-wrap;">${escapeHtml(script.code)}</pre>
       <div class="project-actions">
         <button class="edit-btn" onclick="editScript('${script.id}')">✏️ Edytuj</button>
-        <button class="delete-btn" onclick="deleteScript('${script.id}')">🗑️ Usuń</button>
+        <button class="delete-btn" data-id="${script.id}" onclick="deleteScriptByData(this)">🗑️ Usuń</button>
+        <button class="add-btn" onclick="generateScriptHTML('${script.id}')" style="padding: 8px 15px; margin-left: 10px;">📄 Generate HTML</button>
       </div>
     </div>
   `).join('');
 }
 
-async function addScript() {
+function addScript() {
   const name = document.getElementById('scriptName').value.trim();
+  const file = document.getElementById('scriptFile').value.trim();
   const desc = document.getElementById('scriptDesc').value.trim();
   const code = document.getElementById('scriptCode').value.trim();
+  const editId = document.getElementById('editScriptId').value;
 
-  if(!name || !desc || !code) {
+  if(!name || !desc || !code || !file) {
     showError('Wypełnij wszystkie pola skryptu!');
     return;
   }
 
-  try {
-    await addDoc(collection(db, "scripts"), {
+  const scripts = getScripts();
+  
+  if(editId) {
+    // Edit existing
+    const script = scripts.find(s => s.id === editId);
+    if(script) {
+      script.name = name;
+      script.file = file;
+      script.desc = desc;
+      script.code = code;
+    }
+    document.getElementById('editScriptId').value = '';
+  } else {
+    // Add new
+    const newScript = {
+      id: Date.now().toString(),
       name,
+      file,
       desc,
       code,
       date: new Date().toLocaleDateString('pl-PL')
-    });
-
-    document.getElementById('scriptName').value = '';
-    document.getElementById('scriptDesc').value = '';
-    document.getElementById('scriptCode').value = '';
-
-    const scriptSuccess = document.getElementById('scriptSuccessMsg');
-    scriptSuccess.textContent = '✅ Skrypt został dodany!';
-    scriptSuccess.classList.add('show');
-    setTimeout(() => scriptSuccess.classList.remove('show'), 3000);
-
-    loadScripts();
-  } catch (error) {
-    console.error("Error adding script: ", error);
-    showError('Błąd podczas dodawania skryptu!');
+    };
+    scripts.push(newScript);
   }
+  
+  localStorage.setItem('scripts', JSON.stringify(scripts));
+
+  document.getElementById('scriptName').value = '';
+  document.getElementById('scriptFile').value = '';
+  document.getElementById('scriptDesc').value = '';
+  document.getElementById('scriptCode').value = '';
+
+  const scriptSuccess = document.getElementById('scriptSuccessMsg');
+  scriptSuccess.textContent = editId ? '✅ Skrypt został zaktualizowany!' : '✅ Skrypt został dodany!';
+  scriptSuccess.classList.add('show');
+  setTimeout(() => scriptSuccess.classList.remove('show'), 3000);
+
+  loadScripts();
+  saveScriptsFile();  // Zapisz plik po dodaniu
 }
 
-async function editScript(id) {
-  try {
-    const scripts = await getScripts();
-    const script = scripts.find(s => s.id === id);
-    if(!script) return;
-    document.getElementById('scriptName').value = script.name;
-    document.getElementById('scriptDesc').value = script.desc;
-    document.getElementById('scriptCode').value = script.code;
-    await deleteScript(id, false);
-  } catch (error) {
-    console.error("Error editing script: ", error);
-  }
-}
-
-async function deleteScript(id, showMsg = true) {
-  try {
-    await deleteDoc(doc(db, "scripts", id));
-    if(showMsg) showSuccess('✅ Skrypt został usunięty!');
-    loadScripts();
-  } catch (error) {
-    console.error("Error deleting script: ", error);
-    showError('Błąd podczas usuwania skryptu!');
-  }
-}
-
-function saveScriptsFile() {
+function editScript(id) {
   const scripts = getScripts();
-  const dataStr = JSON.stringify(scripts, null, 2);
-  const blob = new Blob([dataStr], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'scripts.json';
-  a.click();
-  URL.revokeObjectURL(url);
+  const script = scripts.find(s => s.id === id);
+  if(!script) return;
+  document.getElementById('editScriptId').value = id;
+  document.getElementById('scriptName').value = script.name;
+  document.getElementById('scriptFile').value = script.file;
+  document.getElementById('scriptDesc').value = script.desc;
+  document.getElementById('scriptCode').value = script.code;
 }
 
-function escapeHtml(text) {
-  const p = document.createElement('p');
-  p.textContent = text;
-  return p.innerHTML;
+function deleteScript(id, showMsg = true) {
+  console.log('Delete script called with id:', id);
+  const scripts = getScripts();
+  const updatedScripts = scripts.filter(s => s.id !== id);
+  localStorage.setItem('scripts', JSON.stringify(updatedScripts));
+  if(showMsg) showSuccess('✅ Skrypt został usunięty!');
+  loadScripts();
+  saveScriptsFile();  // Zaktualizuj plik po usunięciu
+}
+
+async function saveScriptsFile() {
+  try {
+    const scripts = getScripts();
+    const data = JSON.stringify(scripts, null, 2);
+    const blob = new Blob([data], {type: 'application/json'});
+
+    if ('showSaveFilePicker' in window) {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: 'scripts.json',
+        types: [{
+          description: 'JSON file',
+          accept: {'application/json': ['.json']}
+        }]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+      showSuccess('✅ Plik scripts.json został zapisany!');
+    } else {
+      // Fallback to download
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'scripts.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      showSuccess('✅ Plik scripts.json został pobrany!');
+    }
+  } catch (error) {
+    console.error('Error saving file:', error);
+    showError('Błąd podczas zapisywania pliku!');
+  }
+}
+
+function deleteProjectByData(btn) {
+  const id = btn.getAttribute('data-id');
+  deleteProject(id);
+}
+
+function deleteScriptByData(btn) {
+  const id = btn.getAttribute('data-id');
+  deleteScript(id);
 }
 
 // GET PROJECTS
-async function getProjects() {
-  try {
-    const querySnapshot = await getDocs(collection(db, "projects"));
-    const projects = [];
-    querySnapshot.forEach((doc) => {
-      projects.push({ id: doc.id, ...doc.data() });
-    });
-    return projects;
-  } catch (error) {
-    console.error("Error getting projects: ", error);
-    return [];
-  }
+function getProjects() {
+  return JSON.parse(localStorage.getItem('projects')) || [];
 }
 
 // LOAD PROJECTS
-async function loadProjects() {
-  const projects = await getProjects();
+function loadProjects() {
+  const projects = getProjects();
   const list = document.getElementById('projectsList');
   
   if(projects.length === 0) {
@@ -985,47 +1028,40 @@ async function loadProjects() {
       ${project.link ? `<p><a href="${project.link}" target="_blank" style="color: #ff6b35; text-decoration: none;">🔗 Otwórz Link</a></p>` : ''}
       <div class="project-actions">
         <button class="edit-btn" onclick="editProject('${project.id}')">✏️ Edytuj</button>
-        <button class="delete-btn" onclick="deleteProject('${project.id}')">🗑️ Usuń</button>
+        <button class="delete-btn" data-id="${project.id}" onclick="deleteProjectByData(this)">🗑️ Usuń</button>
       </div>
     </div>
   `).join('');
 }
 
 // EDIT PROJECT
-async function editProject(id) {
-  try {
-    const projects = await getProjects();
-    const project = projects.find(p => p.id === id);
-    
-    if(!project) return;
-    
-    document.getElementById('projectEmoji').value = project.emoji;
-    document.getElementById('projectName').value = project.name;
-    document.getElementById('projectDesc').value = project.desc;
-    document.getElementById('projectLink').value = project.link || '';
-    
-    document.querySelector('.add-project-form').scrollIntoView({ behavior: 'smooth' });
-    
-    await deleteProject(id, false);
-  } catch (error) {
-    console.error("Error editing project: ", error);
-  }
+function editProject(id) {
+  const projects = getProjects();
+  const project = projects.find(p => p.id === id);
+  
+  if(!project) return;
+  
+  document.getElementById('editId').value = id;
+  document.getElementById('projectEmoji').value = project.emoji;
+  document.getElementById('projectName').value = project.name;
+  document.getElementById('projectDesc').value = project.desc;
+  document.getElementById('projectLink').value = project.link || '';
+  
+  document.querySelector('.add-project-form').scrollIntoView({ behavior: 'smooth' });
+  // Nie usuwaj, tylko edytuj
 }
 
 // DELETE PROJECT
-// DELETE PROJECT
-async function deleteProject(id, showMsg = true) {
-  if(!showMsg || confirm('Na pewno chcesz usunąć ten projekt?')) {
-    try {
-      await deleteDoc(doc(db, "projects", id));
-      
-      if(showMsg) showSuccess('✅ Projekt został usunięty!');
-      loadProjects();
-    } catch (error) {
-      console.error("Error deleting project: ", error);
-      showError('Błąd podczas usuwania projektu!');
-    }
-  }
+function deleteProject(id, showMsg = true) {
+  console.log('Delete called with id:', id, 'showMsg:', showMsg);
+  const projects = getProjects();
+  console.log('Current projects:', projects);
+  const updatedProjects = projects.filter(p => p.id !== id);
+  console.log('Filtered projects:', updatedProjects);
+  localStorage.setItem('projects', JSON.stringify(updatedProjects));
+  if(showMsg) showSuccess('✅ Projekt został usunięty!');
+  loadProjects();
+  downloadProjectsFile();  // Zaktualizuj plik po usunięciu
 }
 
 // Gradient z kursorem
@@ -1070,6 +1106,79 @@ themeToggle.addEventListener('click', () => {
 });
 
 document.addEventListener('DOMContentLoaded', initTheme);
+
+// GENERATE HTML FOR SCRIPT
+async function generateScriptHTML(id) {
+  const scripts = getScripts();
+  const script = scripts.find(s => s.id === id);
+  if (!script) return;
+
+  const html = `<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${script.name} - Grzesiu APPs</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+    h1 { color: #333; }
+    pre { background: #fff; padding: 15px; border-radius: 8px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <h1>🛠 ${script.name}</h1>
+  <p><strong>Opis:</strong> ${script.desc}</p>
+  <p><strong>Data dodania:</strong> ${script.date}</p>
+  <h2>Kod JavaScript:</h2>
+  <pre><code>${escapeHtml(script.code)}</code></pre>
+  <script>
+${script.code}
+  </script>
+</body>
+</html>`;
+
+  try {
+    const blob = new Blob([html], { type: 'text/html' });
+
+    if ('showSaveFilePicker' in window) {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: `${script.file}.html`,
+        types: [{
+          description: 'HTML file',
+          accept: { 'text/html': ['.html'] }
+        }]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+      showSuccess(`✅ Plik ${script.file}.html został zapisany!`);
+    } else {
+      // Fallback to download
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${script.file}.html`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showSuccess(`✅ Plik ${script.file}.html został pobrany!`);
+    }
+  } catch (error) {
+    console.error('Error saving HTML file:', error);
+    showError('Błąd podczas zapisywania pliku HTML!');
+  }
+}
+
+// UTILITY FUNCTION
+function escapeHtml(text) {
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return text.replace(/[&<>"']/g, m => map[m]);
+}
 </script>
 
 </body>

@@ -491,14 +491,21 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
   });
 });
 
-// Funkcje do pobierania i wyświetlania projektów z localStorage
-function getProjectsFromStorage() {
-  const data = localStorage.getItem('projects');
-  return data ? JSON.parse(data) : [];
+// Funkcje do pobierania i wyświetlania projektów z pliku JSON
+async function getProjectsFromFile() {
+  try {
+    const response = await fetch('./projects.json');
+    if (!response.ok) throw new Error('Plik projects.json nie znaleziony');
+    const projects = await response.json();
+    return projects;
+  } catch (error) {
+    console.error("Error loading projects: ", error);
+    return [];
+  }
 }
 
-function renderProjects() {
-  const projects = getProjectsFromStorage();
+async function renderProjects() {
+  const projects = await getProjectsFromFile();
   const container = document.getElementById('projectsContainer');
 
   if(!container) return;
@@ -512,8 +519,8 @@ function renderProjects() {
 }
 
 // Inicjalizacja projektów przy wczytaniu strony
-document.addEventListener('DOMContentLoaded', () => {
-  renderProjects();
+document.addEventListener('DOMContentLoaded', async () => {
+  await renderProjects();
 });
 
 const themeToggle = document.getElementById('theme-toggle');

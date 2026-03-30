@@ -7,26 +7,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <!-- Firebase SDK -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-
-  // TODO: Replace with your Firebase config
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  window.db = db;
-  window.collection = collection;
-  window.getDocs = getDocs;
+<script>
+  // Usunięto Firebase - teraz ładuje z pliku projects.json
 </script>
 
 <style>
@@ -130,18 +112,9 @@ nav{background:transparent;}
 </div>
 </div>
 <script>
-async function getScripts() {
-  try {
-    const querySnapshot = await getDocs(collection(db, "scripts"));
-    const scripts = [];
-    querySnapshot.forEach((doc) => {
-      scripts.push(doc.data());
-    });
-    return scripts;
-  } catch (error) {
-    console.error("Error getting scripts: ", error);
-    return [];
-  }
+function getScripts() {
+  // Teraz z pliku scripts.json
+  return fetch('./scripts.json').then(r => r.ok ? r.json() : []).catch(() => []);
 }
 
 async function renderScripts() {
