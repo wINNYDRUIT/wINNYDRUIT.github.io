@@ -643,6 +643,13 @@ Demo: login: <strong>admin</strong> | hasło: <strong>admin123</strong>
 
 <div class="form-row full">
 <div class="form-group-admin">
+<label>Opis skryptu:</label>
+<textarea id="scriptDesc" placeholder="Wpisz opis skryptu"></textarea>
+</div>
+</div>
+
+<div class="form-row full">
+<div class="form-group-admin">
 <label>Treść skryptu (JS):</label>
 <textarea id="scriptCode" placeholder="np. function test(){...}"></textarea>
 </div>
@@ -742,7 +749,7 @@ async function downloadProjectsFile() {
 
     if ('showSaveFilePicker' in window) {
       const handle = await window.showSaveFilePicker({
-        suggestedName: 'projects.json',
+        suggestedName: 'projekty/projects.json',
         types: [{
           description: 'JSON file',
           accept: {'application/json': ['.json']}
@@ -751,7 +758,7 @@ async function downloadProjectsFile() {
       const writable = await handle.createWritable();
       await writable.write(blob);
       await writable.close();
-      showSuccess('✅ Plik projects.json został zapisany!');
+      showSuccess('✅ Plik projekty/projects.json został zapisany!');
     } else {
       // Fallback to download
       const url = URL.createObjectURL(blob);
@@ -881,7 +888,6 @@ function loadScripts() {
       <div class="project-actions">
         <button class="edit-btn" onclick="editScript('${script.id}')">✏️ Edytuj</button>
         <button class="delete-btn" data-id="${script.id}" onclick="deleteScriptByData(this)">🗑️ Usuń</button>
-        <button class="add-btn" onclick="generateScriptHTML('${script.id}')" style="padding: 8px 15px; margin-left: 10px;">📄 Generate HTML</button>
       </div>
     </div>
   `).join('');
@@ -969,7 +975,7 @@ async function saveScriptsFile() {
 
     if ('showSaveFilePicker' in window) {
       const handle = await window.showSaveFilePicker({
-        suggestedName: 'scripts.json',
+        suggestedName: 'skrypt/scripts.json',
         types: [{
           description: 'JSON file',
           accept: {'application/json': ['.json']}
@@ -978,7 +984,7 @@ async function saveScriptsFile() {
       const writable = await handle.createWritable();
       await writable.write(blob);
       await writable.close();
-      showSuccess('✅ Plik scripts.json został zapisany!');
+      showSuccess('✅ Plik skrypt/scripts.json został zapisany!');
     } else {
       // Fallback to download
       const url = URL.createObjectURL(blob);
@@ -1025,7 +1031,7 @@ function loadProjects() {
       <h4>${project.emoji} ${project.name}</h4>
       <p>${project.desc}</p>
       <p style="font-size: 0.85rem; color: #888; margin-bottom: 15px;">Dodano: ${project.date}</p>
-      ${project.link ? `<p><a href="${project.link}" target="_blank" style="color: #ff6b35; text-decoration: none;">🔗 Otwórz Link</a></p>` : ''}
+      ${project.link ? "<p><a href=\"${project.link}\" target=\"_blank\" style=\"color: #ff6b35; text-decoration: none;\">🔗 Otwórz Link</a></p>" : ''}
       <div class="project-actions">
         <button class="edit-btn" onclick="editProject('${project.id}')">✏️ Edytuj</button>
         <button class="delete-btn" data-id="${project.id}" onclick="deleteProjectByData(this)">🗑️ Usuń</button>
@@ -1106,67 +1112,6 @@ themeToggle.addEventListener('click', () => {
 });
 
 document.addEventListener('DOMContentLoaded', initTheme);
-
-// GENERATE HTML FOR SCRIPT
-async function generateScriptHTML(id) {
-  const scripts = getScripts();
-  const script = scripts.find(s => s.id === id);
-  if (!script) return;
-
-  const html = `<!DOCTYPE html>
-<html lang="pl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${script.name} - Grzesiu APPs</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
-    h1 { color: #333; }
-    pre { background: #fff; padding: 15px; border-radius: 8px; overflow-x: auto; }
-  </style>
-</head>
-<body>
-  <h1>🛠 ${script.name}</h1>
-  <p><strong>Opis:</strong> ${script.desc}</p>
-  <p><strong>Data dodania:</strong> ${script.date}</p>
-  <h2>Kod JavaScript:</h2>
-  <pre><code>${escapeHtml(script.code)}</code></pre>
-  <script>
-${script.code}
-  </script>
-</body>
-</html>`;
-
-  try {
-    const blob = new Blob([html], { type: 'text/html' });
-
-    if ('showSaveFilePicker' in window) {
-      const handle = await window.showSaveFilePicker({
-        suggestedName: `${script.file}.html`,
-        types: [{
-          description: 'HTML file',
-          accept: { 'text/html': ['.html'] }
-        }]
-      });
-      const writable = await handle.createWritable();
-      await writable.write(blob);
-      await writable.close();
-      showSuccess(`✅ Plik ${script.file}.html został zapisany!`);
-    } else {
-      // Fallback to download
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${script.file}.html`;
-      a.click();
-      URL.revokeObjectURL(url);
-      showSuccess(`✅ Plik ${script.file}.html został pobrany!`);
-    }
-  } catch (error) {
-    console.error('Error saving HTML file:', error);
-    showError('Błąd podczas zapisywania pliku HTML!');
-  }
-}
 
 // UTILITY FUNCTION
 function escapeHtml(text) {

@@ -491,12 +491,12 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
   });
 });
 
-// Funkcje do pobierania i wyświetlania projektów z pliku JSON
-async function getProjectsFromFile() {
+// Funkcje do pobierania i wyświetlania projektów z localStorage
+function getProjectsFromStorage() {
   try {
-    const response = await fetch('./projects.json');
-    if (!response.ok) throw new Error('Plik projects.json nie znaleziony');
-    const projects = await response.json();
+    console.log('Loading projects from localStorage');
+    const projects = JSON.parse(localStorage.getItem('projects') || '[]');
+    console.log('Loaded projects:', projects);
     return projects;
   } catch (error) {
     console.error("Error loading projects: ", error);
@@ -504,11 +504,17 @@ async function getProjectsFromFile() {
   }
 }
 
-async function renderProjects() {
-  const projects = await getProjectsFromFile();
+function renderProjects() {
+  console.log('Rendering projects...');
+  const projects = getProjectsFromStorage();
   const container = document.getElementById('projectsContainer');
 
-  if(!container) return;
+  if(!container) {
+    console.error('projectsContainer not found');
+    return;
+  }
+
+  console.log('Projects length:', projects.length);
 
   if(projects.length === 0) {
     container.innerHTML = '<div class="project" style="background: rgba(0,0,0,0.3); border: 2px dashed rgba(255,107,53,0.4);">\n      <h3>Brak projektów</h3>\n      <p>Dodaj projekty w panelu admina.</p>\n      </div>';
@@ -516,11 +522,12 @@ async function renderProjects() {
   }
 
   container.innerHTML = projects.map((project, index) => `\n    <div class="project" style="animation: fadeInUp 0.5s ease-out ${0.1 * index}s both;">\n      <h3>${project.emoji || '📌'} ${project.name}</h3>\n      <p>${project.desc}</p>\n      ${project.link ? `<a class="btn" href="${project.link}" target="_blank">Dowiedz się więcej</a>` : ''}\n    </div>\n  `).join('');
+  console.log('Projects rendered');
 }
 
 // Inicjalizacja projektów przy wczytaniu strony
-document.addEventListener('DOMContentLoaded', async () => {
-  await renderProjects();
+document.addEventListener('DOMContentLoaded', () => {
+  renderProjects();
 });
 
 const themeToggle = document.getElementById('theme-toggle');
