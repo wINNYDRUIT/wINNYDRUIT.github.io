@@ -112,18 +112,31 @@ nav{background:transparent;}
 </div>
 </div>
 <script>
-function getScripts() {
-  // Teraz z localStorage
+async function getScripts() {
   try {
-    return JSON.parse(localStorage.getItem('scripts') || '[]');
+    const storageData = localStorage.getItem('scripts');
+    if (storageData) {
+      const scripts = JSON.parse(storageData);
+      console.log('Loaded scripts from localStorage:', scripts);
+      return scripts;
+    }
+
+    console.log('No scripts in localStorage, loading skrypt/scripts.json');
+    const response = await fetch('skrypt/scripts.json');
+    if (!response.ok) {
+      throw new Error(`Failed to load skrypt/scripts.json: ${response.status}`);
+    }
+    const scripts = await response.json();
+    console.log('Loaded scripts from JSON file:', scripts);
+    return scripts;
   } catch (error) {
-    console.error("Error loading scripts: ", error);
+    console.error('Error loading scripts: ', error);
     return [];
   }
 }
 
 async function renderScripts() {
-  const scripts = getScripts();
+  const scripts = await getScripts();
   const container = document.getElementById('scriptsContainer');
 
   if(!scripts.length) {
@@ -147,8 +160,8 @@ function escapeHtml(text) {
   return p.innerHTML;
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  renderScripts();
+window.addEventListener('DOMContentLoaded', async () => {
+  await renderScripts();
   showScripts();
 });
 

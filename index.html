@@ -491,22 +491,33 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
   });
 });
 
-// Funkcje do pobierania i wyświetlania projektów z localStorage
-function getProjectsFromStorage() {
+// Funkcje do pobierania i wyświetlania projektów z localStorage lub pliku JSON
+async function getProjectsFromStorage() {
   try {
-    console.log('Loading projects from localStorage');
-    const projects = JSON.parse(localStorage.getItem('projects') || '[]');
-    console.log('Loaded projects:', projects);
+    const storageData = localStorage.getItem('projects');
+    if (storageData) {
+      const projects = JSON.parse(storageData);
+      console.log('Loaded projects from localStorage:', projects);
+      return projects;
+    }
+
+    console.log('No projects in localStorage, loading Projekty/projects.json');
+    const response = await fetch('Projekty/projects.json');
+    if (!response.ok) {
+      throw new Error(`Failed to load Projekty/projects.json: ${response.status}`);
+    }
+    const projects = await response.json();
+    console.log('Loaded projects from JSON file:', projects);
     return projects;
   } catch (error) {
-    console.error("Error loading projects: ", error);
+    console.error('Error loading projects: ', error);
     return [];
   }
 }
 
-function renderProjects() {
+async function renderProjects() {
   console.log('Rendering projects...');
-  const projects = getProjectsFromStorage();
+  const projects = await getProjectsFromStorage();
   const container = document.getElementById('projectsContainer');
 
   if(!container) {
@@ -526,8 +537,8 @@ function renderProjects() {
 }
 
 // Inicjalizacja projektów przy wczytaniu strony
-document.addEventListener('DOMContentLoaded', () => {
-  renderProjects();
+document.addEventListener('DOMContentLoaded', async () => {
+  await renderProjects();
 });
 
 const themeToggle = document.getElementById('theme-toggle');
