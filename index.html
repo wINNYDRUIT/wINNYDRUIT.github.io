@@ -497,11 +497,14 @@ async function getProjectsFromStorage() {
     const storageData = localStorage.getItem('projects');
     if (storageData) {
       const projects = JSON.parse(storageData);
-      console.log('Loaded projects from localStorage:', projects);
-      return projects;
+      if (Array.isArray(projects) && projects.length > 0) {
+        console.log('Loaded projects from localStorage:', projects);
+        return projects;
+      }
+      console.log('LocalStorage projects empty, loading Projekty/projects.json');
     }
 
-    console.log('No projects in localStorage, loading Projekty/projects.json');
+    console.log('Loading Projekty/projects.json');
     const response = await fetch('Projekty/projects.json');
     if (!response.ok) {
       throw new Error(`Failed to load Projekty/projects.json: ${response.status}`);

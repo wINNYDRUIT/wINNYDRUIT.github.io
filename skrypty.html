@@ -117,11 +117,14 @@ async function getScripts() {
     const storageData = localStorage.getItem('scripts');
     if (storageData) {
       const scripts = JSON.parse(storageData);
-      console.log('Loaded scripts from localStorage:', scripts);
-      return scripts;
+      if (Array.isArray(scripts) && scripts.length > 0) {
+        console.log('Loaded scripts from localStorage:', scripts);
+        return scripts;
+      }
+      console.log('LocalStorage scripts empty, loading skrypt/scripts.json');
     }
 
-    console.log('No scripts in localStorage, loading skrypt/scripts.json');
+    console.log('Loading skrypt/scripts.json');
     const response = await fetch('skrypt/scripts.json');
     if (!response.ok) {
       throw new Error(`Failed to load skrypt/scripts.json: ${response.status}`);
