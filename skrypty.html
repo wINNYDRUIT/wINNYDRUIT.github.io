@@ -111,6 +111,27 @@ nav{background:transparent;}
 <div id="scriptsContainer"></div>
 </div>
 </div>
+
+<script id="data" type="application/json">
+{
+  "projects": [
+    {
+      "name": "Przykładowy projekt",
+      "desc": "Opis projektu, który będzie wyświetlany na stronie głównej.",
+      "link": "https://example.com",
+      "emoji": "🚀"
+    }
+  ],
+  "scripts": [
+    {
+      "name": "Przykładowy skrypt",
+      "desc": "Opis skryptu do wczytania w sekcji skryptów.",
+      "code": "print('Hello Roblox')",
+      "date": "2026-04-08"
+    }
+  ]
+}
+</script>
 <script>
 async function getScripts() {
   try {
@@ -121,17 +142,18 @@ async function getScripts() {
         console.log('Loaded scripts from localStorage:', scripts);
         return scripts;
       }
-      console.log('LocalStorage scripts empty, loading skrypt/scripts.json');
     }
 
-    console.log('Loading skrypt/scripts.json');
-    const response = await fetch('skrypt/scripts.json');
-    if (!response.ok) {
-      throw new Error(`Failed to load skrypt/scripts.json: ${response.status}`);
+    // Fallback do wbudowanych danych
+    const dataScript = document.getElementById('data');
+    if (dataScript) {
+      const jsonData = JSON.parse(dataScript.textContent);
+      const scripts = Array.isArray(jsonData.scripts) ? jsonData.scripts : [];
+      console.log('Loaded scripts from embedded data:', scripts);
+      return scripts;
     }
-    const scripts = await response.json();
-    console.log('Loaded scripts from JSON file:', scripts);
-    return scripts;
+
+    return [];
   } catch (error) {
     console.error('Error loading scripts: ', error);
     return [];

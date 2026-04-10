@@ -77,6 +77,33 @@ font-family:'Inter',sans-serif;
   --footer-border: rgba(0,100,0,0.2);
 }
 
+.dark-mode .hero h1{
+  text-shadow: 0 0 30px rgba(255,255,255,0.8), 0 0 60px rgba(255,255,255,0.4);
+}
+
+.dark-mode .hero p{
+  text-shadow: 0 0 20px rgba(255,255,255,0.5);
+}
+
+.dark-mode .btn{
+  box-shadow: 0 0 25px rgba(255,255,255,0.18), 0 0 40px rgba(255,255,255,0.12);
+}
+
+.dark-mode .btn:hover{
+  box-shadow:
+    0 0 50px rgba(255,255,255,0.35),
+    0 0 100px rgba(255,255,255,0.18),
+    0 0 25px rgba(255,255,255,0.12);
+}
+
+.dark-mode .project:hover,
+.dark-mode .script-card:hover{
+  box-shadow:
+    0 15px 50px rgba(255,255,255,0.16),
+    inset 0 0 20px rgba(255,255,255,0.08),
+    0 0 30px rgba(255,255,255,0.12);
+}
+
 /* Body i dynamiczne tło z gradientem i efektem kursora */
 body{
 color:var(--text);
@@ -420,10 +447,14 @@ z-index: 2;
 © 2026 Grzesiu APPs - Wszystkie prawa zastrzeżone
 </footer>
 
+
+
 <script>
 /* Animacja pojawiania projektów na scroll */
 const projectElements = document.querySelectorAll(".project");
 const scriptElements = document.querySelectorAll(".script-card");
+const scriptsSection = document.getElementById('skrypty');
+let hasRedirectedToScripts = false;
 
 function showProjects(){
   projectElements.forEach(el => {
@@ -447,12 +478,25 @@ function showScripts(){
   });
 }
 
+function redirectToScriptsIfDeep(){
+  if(hasRedirectedToScripts || !scriptsSection) return;
+  const scrollPosition = window.scrollY + window.innerHeight;
+  const pageHeight = document.documentElement.scrollHeight;
+  const nearBottom = pageHeight - 120;
+  if(scrollPosition >= nearBottom){
+    hasRedirectedToScripts = true;
+    window.location.href = 'skrypty.html';
+  }
+}
+
 window.addEventListener("scroll", () => {
   showProjects();
   showScripts();
+  redirectToScriptsIfDeep();
 });
 showProjects();
 showScripts();
+redirectToScriptsIfDeep();
 
 /* Gradient reagujący na ruch kursora - KOLOROWE */
 document.addEventListener("mousemove", e => {
@@ -491,7 +535,7 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
   });
 });
 
-// Funkcje do pobierania i wyświetlania projektów z localStorage lub pliku JSON
+// Funkcje do pobierania i wyświetlania projektów z localStorage lub wbudowanych danych
 async function getProjectsFromStorage() {
   try {
     const storageData = localStorage.getItem('projects');
@@ -501,17 +545,18 @@ async function getProjectsFromStorage() {
         console.log('Loaded projects from localStorage:', projects);
         return projects;
       }
-      console.log('LocalStorage projects empty, loading Projekty/projects.json');
     }
 
-    console.log('Loading Projekty/projects.json');
-    const response = await fetch('Projekty/projects.json');
-    if (!response.ok) {
-      throw new Error(`Failed to load Projekty/projects.json: ${response.status}`);
+    // Fallback do wbudowanych danych
+    const dataScript = document.getElementById('data');
+    if (dataScript) {
+      const jsonData = JSON.parse(dataScript.textContent);
+      const projects = Array.isArray(jsonData.projects) ? jsonData.projects : [];
+      console.log('Loaded projects from embedded data:', projects);
+      return projects;
     }
-    const projects = await response.json();
-    console.log('Loaded projects from JSON file:', projects);
-    return projects;
+
+    return [];
   } catch (error) {
     console.error('Error loading projects: ', error);
     return [];
