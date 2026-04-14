@@ -1031,7 +1031,7 @@ function loadProjects() {
       <h4>${project.emoji} ${project.name}</h4>
       <p>${project.desc}</p>
       <p style="font-size: 0.85rem; color: #888; margin-bottom: 15px;">Dodano: ${project.date}</p>
-      ${project.link ? "<p><a href=\"${project.link}\" target=\"_blank\" style=\"color: #ff6b35; text-decoration: none;\">🔗 Otwórz Link</a></p>" : ''}
+      ${project.link ? `<p><a href="${project.link}" target="_blank" style="color: #ff6b35; text-decoration: none;">🔗 Otwórz Link</a></p>` : ''}
       <div class="project-actions">
         <button class="edit-btn" onclick="editProject('${project.id}')">✏️ Edytuj</button>
         <button class="delete-btn" data-id="${project.id}" onclick="deleteProjectByData(this)">🗑️ Usuń</button>

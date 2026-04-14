@@ -370,77 +370,48 @@ z-index: 2;
 
 /* Animacje */
 @keyframes slideDown {
-    from {
-        transform: translateY(-100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+    from { transform: translateY(-100%); opacity:0; }
+    to { transform: translateY(0); opacity:1; }
 }
 
 @keyframes fadeInUp {
-    from {
-        transform: translateY(20px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+    from { transform: translateY(20px); opacity:0; }
+    to { transform: translateY(0); opacity:1; }
 }
 
 @keyframes scaleIn {
-    from {
-        transform: scale(0.7);
-        opacity: 0;
-    }
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
+    from { transform: scale(0.7); opacity:0; }
+    to { transform: scale(1); opacity:1; }
 }
-
 </style>
 
 </head>
 
 <body>
 <div id="theme-wipe" class="theme-wipe"></div>
+
 <header>
 <a class="logo" href="#home">⚡ Grzesiu APPs</a>
 <nav>
 <a href="#home" class="nav-link active">Home</a>
 <a href="#projekty" class="nav-link">Projekty</a>
-<a href="#skrypty" class="nav-link">Skrypty</a>
 <a href="#kontakt" class="nav-link">Kontakt</a>
-<button id="theme-toggle" style="margin-left:25px; background:none; border:none; color:var(--nav-color); font-size:20px; cursor:pointer;">🌙</button>
+<a class="btn" href="skrypty.html" style="margin-left:25px; padding:8px 14px; background:none; border:2px solid var(--nav-color); color:var(--nav-color); font-size:0.95rem; border-radius:8px;">Skrypty</a>
 </nav>
 </header>
 
 <section class="hero" id="home">
 <h1>Grzesiu Apps</h1>
 <p>Odkrywaj moje projekty i aplikacje</p>
-<a class="btn" href="#projekty">Przejdź do Projektów</a>
+<div style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center;">
+  <a class="btn" href="#projekty">Przejdź do Projektów</a>
+  <a class="btn" href="skrypty.html">Przejdź do Skryptów</a>
+</div>
 </section>
 
 <section class="section" id="projekty">
 <h2>Moje Projekty</h2>
-<div class="projects" id="projectsContainer">
-<!-- Projekty będą ładowane dynamicznie -->
-</div>
-</section>
-
-<section class="section" id="skrypty">
-<h2>Skrypty</h2>
-<div class="scripts" style="display:grid; grid-template-columns:1fr; gap:20px;">
-<div class="script-card">
-<h3>📄 Skrypty do ROBLOX</h3>
-<p>W tej sekcji możesz zamieszczać przydatne skrypty oraz fragmenty kodu do wstawienia w Twoje aplikacje.</p>
-<a class="btn" href="skrypty.html">Przejdź do pełnej sekcji Skrypty</a>
-</div>
-</div>
+<div class="projects" id="projectsContainer"></div>
 </section>
 
 <footer id="kontakt">
@@ -448,182 +419,118 @@ z-index: 2;
 </footer>
 
 
-
 <script>
-/* Animacja pojawiania projektów na scroll */
-const projectElements = document.querySelectorAll(".project");
-const scriptElements = document.querySelectorAll(".script-card");
-const scriptsSection = document.getElementById('skrypty');
-let hasRedirectedToScripts = false;
+(function () {
+  function applyTheme(dark) {
+    document.documentElement.classList.toggle('dark-mode', dark);
 
-function showProjects(){
-  projectElements.forEach(el => {
-    const position = el.getBoundingClientRect().top;
-    const screenPosition = window.innerHeight / 1.2;
-    if(position < screenPosition){
-      el.style.opacity = "1";
-      el.style.transform = "translateY(0)";
-    }
-  });
-}
-
-function showScripts(){
-  scriptElements.forEach(el => {
-    const position = el.getBoundingClientRect().top;
-    const screenPosition = window.innerHeight / 1.2;
-    if(position < screenPosition){
-      el.style.opacity = "1";
-      el.style.transform = "translateY(0)";
-    }
-  });
-}
-
-function redirectToScriptsIfDeep(){
-  if(hasRedirectedToScripts || !scriptsSection) return;
-  const scrollPosition = window.scrollY + window.innerHeight;
-  const pageHeight = document.documentElement.scrollHeight;
-  const nearBottom = pageHeight - 120;
-  if(scrollPosition >= nearBottom){
-    hasRedirectedToScripts = true;
-    window.location.href = 'skrypty.html';
+    const btn = document.getElementById('theme-toggle');
+    if (btn) btn.textContent = dark ? '☀️' : '🌙';
   }
-}
 
-window.addEventListener("scroll", () => {
-  showProjects();
-  showScripts();
-  redirectToScriptsIfDeep();
-});
-showProjects();
-showScripts();
-redirectToScriptsIfDeep();
+  function initTheme() {
+    const saved = localStorage.getItem('theme');
+    applyTheme(saved === 'dark');
+  }
 
-/* Gradient reagujący na ruch kursora - KOLOROWE */
-document.addEventListener("mousemove", e => {
-  const xPercent = (e.clientX / window.innerWidth) * 100;
-  const yPercent = (e.clientY / window.innerHeight) * 100;
-  document.body.style.backgroundPosition = `${xPercent}% ${yPercent}%`;
-});
+  function toggleTheme() {
+    const isDark = document.documentElement.classList.contains('dark-mode');
+    const newTheme = !isDark;
 
-/* Nawigacja - zaznaczanie aktywnego linku */
-document.querySelectorAll('.nav-link').forEach(link => {
-  link.addEventListener('click', function(e) {
-    e.preventDefault();
-    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-    this.classList.add('active');
-    const targetId = this.getAttribute('href');
-    document.querySelector(targetId).scrollIntoView({ behavior: 'smooth' });
-  });
-});
+    applyTheme(newTheme);
+    localStorage.setItem('theme', newTheme ? 'dark' : 'light');
+  }
 
-/* Smooth scroll na przyciskach */
-document.querySelectorAll('a[href^="#"]').forEach(link => {
-  link.addEventListener('click', function(e) {
-    const targetId = this.getAttribute('href');
-    if(targetId && targetId !== '#') {
-      e.preventDefault();
-      const target = document.querySelector(targetId);
-      if(target) {
-        target.scrollIntoView({ behavior: 'smooth' });
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        const activeLink = document.querySelector(`a[href="${targetId}"]`);
-        if(activeLink && activeLink.classList.contains('nav-link')) {
-          activeLink.classList.add('active');
+  function initAnchors() {
+    document.querySelectorAll('a.nav-link[href^="#"]').forEach(link => {
+      link.addEventListener('click', function (event) {
+        const target = document.querySelector(this.hash);
+        if (!target) return;
+        event.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        history.replaceState(null, '', this.hash);
+      });
+    });
+  }
+
+  async function getProjectsFromStorage() {
+    try {
+      const storageData = localStorage.getItem('projects');
+      if (storageData) {
+        const projects = JSON.parse(storageData);
+        if (Array.isArray(projects) && projects.length > 0) {
+          return projects;
         }
       }
-    }
-  });
-});
 
-// Funkcje do pobierania i wyświetlania projektów z localStorage lub wbudowanych danych
-async function getProjectsFromStorage() {
-  try {
-    const storageData = localStorage.getItem('projects');
-    if (storageData) {
-      const projects = JSON.parse(storageData);
-      if (Array.isArray(projects) && projects.length > 0) {
-        console.log('Loaded projects from localStorage:', projects);
-        return projects;
+      const dataScript = document.getElementById('data');
+      if (dataScript) {
+        const jsonData = JSON.parse(dataScript.textContent);
+        return Array.isArray(jsonData.projects) ? jsonData.projects : [];
       }
+
+      return [];
+    } catch (error) {
+      console.error('Error loading projects:', error);
+      return [];
+    }
+  }
+
+  function showProjects() {
+    document.querySelectorAll('.project').forEach(el => {
+      const position = el.getBoundingClientRect().top;
+      const screenPosition = window.innerHeight / 1.2;
+      if (position < screenPosition) {
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+      }
+    });
+  }
+
+  function redirectToScriptsIfDeep() {
+    const scriptsSection = document.getElementById('skrypty');
+    if (!scriptsSection) return;
+    const rect = scriptsSection.getBoundingClientRect();
+    if (rect.top <= window.innerHeight * 0.3 && rect.bottom > 0) {
+      window.location.href = 'skrypty.html';
+    }
+  }
+
+  async function renderProjects() {
+    const projects = await getProjectsFromStorage();
+    const container = document.getElementById('projectsContainer');
+    if (!container) return;
+
+    if (projects.length === 0) {
+      container.innerHTML = '<div class="project" style="background: rgba(0,0,0,0.3); border: 2px dashed rgba(255,107,53,0.4); padding:40px; border-radius:15px;">\n        <h3>Brak projektów</h3>\n        <p>Dodaj projekty w panelu admina.</p>\n      </div>';
+      showProjects();
+      return;
     }
 
-    // Fallback do wbudowanych danych
-    const dataScript = document.getElementById('data');
-    if (dataScript) {
-      const jsonData = JSON.parse(dataScript.textContent);
-      const projects = Array.isArray(jsonData.projects) ? jsonData.projects : [];
-      console.log('Loaded projects from embedded data:', projects);
-      return projects;
+    container.innerHTML = projects.map((project, index) => `\n      <div class="project" style="animation: fadeInUp 0.5s ease-out ${0.1 * index}s both;">\n        <h3>${project.emoji || '📌'} ${project.name}</h3>\n        <p>${project.desc}</p>\n        ${project.link ? `<a class="btn" href="${project.link}" target="_blank">Dowiedz się więcej</a>` : ''}\n      </div>\n    `).join('');
+    showProjects();
+  }
+
+  document.addEventListener('DOMContentLoaded', async function () {
+    initTheme();
+    initAnchors();
+
+    const btn = document.getElementById('theme-toggle');
+    if (btn) {
+      btn.addEventListener('click', toggleTheme);
     }
 
-    return [];
-  } catch (error) {
-    console.error('Error loading projects: ', error);
-    return [];
-  }
-}
+    await renderProjects();
+    showProjects();
+    redirectToScriptsIfDeep();
 
-async function renderProjects() {
-  console.log('Rendering projects...');
-  const projects = await getProjectsFromStorage();
-  const container = document.getElementById('projectsContainer');
-
-  if(!container) {
-    console.error('projectsContainer not found');
-    return;
-  }
-
-  console.log('Projects length:', projects.length);
-
-  if(projects.length === 0) {
-    container.innerHTML = '<div class="project" style="background: rgba(0,0,0,0.3); border: 2px dashed rgba(255,107,53,0.4);">\n      <h3>Brak projektów</h3>\n      <p>Dodaj projekty w panelu admina.</p>\n      </div>';
-    return;
-  }
-
-  container.innerHTML = projects.map((project, index) => `\n    <div class="project" style="animation: fadeInUp 0.5s ease-out ${0.1 * index}s both;">\n      <h3>${project.emoji || '📌'} ${project.name}</h3>\n      <p>${project.desc}</p>\n      ${project.link ? `<a class="btn" href="${project.link}" target="_blank">Dowiedz się więcej</a>` : ''}\n    </div>\n  `).join('');
-  console.log('Projects rendered');
-}
-
-// Inicjalizacja projektów przy wczytaniu strony
-document.addEventListener('DOMContentLoaded', async () => {
-  await renderProjects();
-});
-
-const themeToggle = document.getElementById('theme-toggle');
-const themeWipe = document.getElementById('theme-wipe');
-
-function setTheme(dark) {
-  if (dark) {
-    document.body.classList.add('dark-mode');
-    themeToggle.textContent = '☀️';
-    localStorage.setItem('theme', 'dark');
-  } else {
-    document.body.classList.remove('dark-mode');
-    themeToggle.textContent = '🌙';
-    localStorage.setItem('theme', 'light');
-  }
-}
-
-function initTheme() {
-  const theme = localStorage.getItem('theme');
-  setTheme(theme === 'dark');
-}
-
-themeToggle.addEventListener('click', () => {
-  const toDark = !document.body.classList.contains('dark-mode');
-  themeWipe.classList.remove('slide-to-dark', 'slide-to-light');
-  themeWipe.classList.add(toDark ? 'slide-to-dark' : 'slide-to-light');
-
-  setTimeout(() => {
-    setTheme(toDark);
-  }, 250);
-
-  themeWipe.addEventListener('animationend', () => {
-    themeWipe.classList.remove('slide-to-dark', 'slide-to-light');
-  }, { once: true });
-});
-
-document.addEventListener('DOMContentLoaded', initTheme);
+    window.addEventListener('scroll', () => {
+      showProjects();
+      redirectToScriptsIfDeep();
+    });
+    window.addEventListener('resize', redirectToScriptsIfDeep);
+  });
+})();
 </script>
 
 </body>
