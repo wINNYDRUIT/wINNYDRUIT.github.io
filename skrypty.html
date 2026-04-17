@@ -114,50 +114,51 @@ nav{background:transparent;}
 
 <script id="data" type="application/json">
 {
-  "projects": [
-    {
-      "name": "Przykładowy projekt",
-      "desc": "Opis projektu, który będzie wyświetlany na stronie głównej.",
-      "link": "https://example.com",
-      "emoji": "🚀"
-    }
-  ],
-  "scripts": [
-    {
-      "name": "Przykładowy skrypt",
-      "desc": "Opis skryptu do wczytania w sekcji skryptów.",
-      "code": "print('Hello Roblox')",
-      "date": "2026-04-08"
-    }
-  ]
+  "scripts": []
 }
 </script>
 <script>
-async function getScripts() {
+async function fetchJsonFile(url) {
   try {
-    const storageData = localStorage.getItem('scripts');
-    if (storageData) {
-      const scripts = JSON.parse(storageData);
-      if (Array.isArray(scripts) && scripts.length > 0) {
-        console.log('Loaded scripts from localStorage:', scripts);
-        return scripts;
-      }
-    }
+    const response = await fetch(url, { cache: 'no-store' });
+    if (!response.ok) return null;
+    return await response.json();
+  } catch (error) {
+    return null;
+  }
+}
 
-    // Fallback do wbudowanych danych
+async function getScripts() {
+  const urls = ['scripts.json', 'skrypty-scripts.json', 'skrypty-sripts.json'];
+  for (const url of urls) {
+    const data = await fetchJsonFile(url);
+    if (data) {
+      if (Array.isArray(data.scripts)) return data.scripts;
+      if (Array.isArray(data)) return data;
+    }
+  }
+
+  try {
+    const stored = localStorage.getItem('scripts');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch (error) {
+    console.error('Error reading localStorage scripts:', error);
+  }
+
+  try {
     const dataScript = document.getElementById('data');
     if (dataScript) {
       const jsonData = JSON.parse(dataScript.textContent);
-      const scripts = Array.isArray(jsonData.scripts) ? jsonData.scripts : [];
-      console.log('Loaded scripts from embedded data:', scripts);
-      return scripts;
+      return Array.isArray(jsonData.scripts) ? jsonData.scripts : [];
     }
-
-    return [];
   } catch (error) {
-    console.error('Error loading scripts: ', error);
-    return [];
+    console.error('Error loading inline scripts:', error);
   }
+
+  return [];
 }
 
 async function renderScripts() {

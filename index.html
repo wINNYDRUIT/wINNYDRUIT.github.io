@@ -415,9 +415,14 @@ z-index: 2;
 </section>
 
 <footer id="kontakt">
-© 2026 Grzesiu APPs - Wszystkie prawa zastrzeżone
+© 2026  Grzesiu APPs - Wszystkie prawa zastrzeżone
 </footer>
 
+<script id="data" type="application/json">
+{
+  "projects": []
+}
+</script>
 
 <script>
 (function () {
@@ -453,27 +458,47 @@ z-index: 2;
     });
   }
 
-  async function getProjectsFromStorage() {
+  async function fetchJsonFile(url) {
     try {
-      const storageData = localStorage.getItem('projects');
-      if (storageData) {
-        const projects = JSON.parse(storageData);
-        if (Array.isArray(projects) && projects.length > 0) {
-          return projects;
-        }
-      }
+      const response = await fetch(url, { cache: 'no-store' });
+      if (!response.ok) return null;
+      return await response.json();
+    } catch (error) {
+      return null;
+    }
+  }
 
+  async function getProjectsFromStorage() {
+    const urls = ['projects.json', 'projekty-projects.json'];
+    for (const url of urls) {
+      const data = await fetchJsonFile(url);
+      if (data) {
+        if (Array.isArray(data.projects)) return data.projects;
+        if (Array.isArray(data)) return data;
+      }
+    }
+
+    try {
+      const stored = localStorage.getItem('projects');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (error) {
+      console.error('Error reading localStorage projects:', error);
+    }
+
+    try {
       const dataScript = document.getElementById('data');
       if (dataScript) {
         const jsonData = JSON.parse(dataScript.textContent);
         return Array.isArray(jsonData.projects) ? jsonData.projects : [];
       }
-
-      return [];
     } catch (error) {
-      console.error('Error loading projects:', error);
-      return [];
+      console.error('Error loading inline projects:', error);
     }
+
+    return [];
   }
 
   function showProjects() {

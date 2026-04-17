@@ -622,8 +622,6 @@ Demo: login: <strong>admin</strong> | hasło: <strong>admin123</strong>
 <div class="empty-state">Brak projektów. Dodaj swój pierwszy projekt!</div>
 </div>
 
-<button class="add-btn" onclick="downloadProjectsFile()" style="margin-top: 20px;">Eksportuj Projekty do JSON</button>
-
 <!-- SCRIPTS SECTION -->
 <div class="section-title">💻 Zarządzanie Skryptami</div>
 <div class="add-project-form" style="padding-top: 20px;">
@@ -663,7 +661,7 @@ Demo: login: <strong>admin</strong> | hasło: <strong>admin123</strong>
 <div class="empty-state">Brak skryptów. Dodaj swój pierwszy skrypt!</div>
 </div>
 
-<button class="add-btn" onclick="saveScriptsFile()" style="margin-top: 20px;">Eksportuj Skrypty do JSON</button>
+<button class="add-btn" onclick="downloadAllDataFiles()" style="margin-top: 20px;">Eksportuj JSON dla index.html i skrypty.html</button>
 
 </div>
 </div>
@@ -741,7 +739,7 @@ function logout() {
 }
 
 // Eksport projektów do pliku JSON
-async function downloadProjectsFile() {
+async function downloadProjectsFile(showNotification = true) {
   try {
     const projects = getProjects();
     const data = JSON.stringify(projects, null, 2);
@@ -749,7 +747,7 @@ async function downloadProjectsFile() {
 
     if ('showSaveFilePicker' in window) {
       const handle = await window.showSaveFilePicker({
-        suggestedName: 'projekty/projects.json',
+        suggestedName: 'projects.json',
         types: [{
           description: 'JSON file',
           accept: {'application/json': ['.json']}
@@ -758,7 +756,7 @@ async function downloadProjectsFile() {
       const writable = await handle.createWritable();
       await writable.write(blob);
       await writable.close();
-      showSuccess('✅ Plik projekty/projects.json został zapisany!');
+      if (showNotification) showSuccess('✅ Plik projects.json został zapisany!');
     } else {
       // Fallback to download
       const url = URL.createObjectURL(blob);
@@ -767,12 +765,26 @@ async function downloadProjectsFile() {
       a.download = 'projects.json';
       a.click();
       URL.revokeObjectURL(url);
-      showSuccess('✅ Plik projects.json został pobrany!');
+      if (showNotification) showSuccess('✅ Plik projects.json został pobrany!');
     }
   } catch (error) {
     console.error('Error saving file:', error);
+    if (error && (error.name === 'AbortError' || error.name === 'SecurityError')) {
+      return;
+    }
     showError('Błąd podczas zapisywania pliku!');
   }
+}
+
+function downloadFile(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 // CHECK LOGIN STATUS
@@ -862,7 +874,6 @@ function addProject() {
   
   showSuccess(editId ? '✅ Projekt został zaktualizowany!' : '✅ Projekt został dodany!');
   loadProjects();
-  downloadProjectsFile();  // Zapisz plik po dodaniu
 }
 
 // SCRIPTS HANDLERS
@@ -943,7 +954,6 @@ function addScript() {
   setTimeout(() => scriptSuccess.classList.remove('show'), 3000);
 
   loadScripts();
-  saveScriptsFile();  // Zapisz plik po dodaniu
 }
 
 function editScript(id) {
@@ -964,10 +974,9 @@ function deleteScript(id, showMsg = true) {
   localStorage.setItem('scripts', JSON.stringify(updatedScripts));
   if(showMsg) showSuccess('✅ Skrypt został usunięty!');
   loadScripts();
-  saveScriptsFile();  // Zaktualizuj plik po usunięciu
 }
 
-async function saveScriptsFile() {
+async function saveScriptsFile(showNotification = true) {
   try {
     const scripts = getScripts();
     const data = JSON.stringify(scripts, null, 2);
@@ -975,7 +984,7 @@ async function saveScriptsFile() {
 
     if ('showSaveFilePicker' in window) {
       const handle = await window.showSaveFilePicker({
-        suggestedName: 'skrypt/scripts.json',
+        suggestedName: 'scripts.json',
         types: [{
           description: 'JSON file',
           accept: {'application/json': ['.json']}
@@ -984,7 +993,7 @@ async function saveScriptsFile() {
       const writable = await handle.createWritable();
       await writable.write(blob);
       await writable.close();
-      showSuccess('✅ Plik skrypt/scripts.json został zapisany!');
+      if (showNotification) showSuccess('✅ Plik scripts.json został zapisany!');
     } else {
       // Fallback to download
       const url = URL.createObjectURL(blob);
@@ -993,11 +1002,29 @@ async function saveScriptsFile() {
       a.download = 'scripts.json';
       a.click();
       URL.revokeObjectURL(url);
-      showSuccess('✅ Plik scripts.json został pobrany!');
+      if (showNotification) showSuccess('✅ Plik scripts.json został pobrany!');
     }
   } catch (error) {
     console.error('Error saving file:', error);
+    if (error && (error.name === 'AbortError' || error.name === 'SecurityError')) {
+      return;
+    }
     showError('Błąd podczas zapisywania pliku!');
+  }
+}
+
+async function downloadAllDataFiles() {
+  try {
+    const projects = getProjects();
+    const scripts = getScripts();
+
+    downloadFile(new Blob([JSON.stringify(projects, null, 2)], { type: 'application/json' }), 'projects.json');
+    downloadFile(new Blob([JSON.stringify(scripts, null, 2)], { type: 'application/json' }), 'scripts.json');
+
+    showSuccess('✅ Pliki JSON zostały wygenerowane: projects.json i scripts.json');
+  } catch (error) {
+    console.error('Error exporting files:', error);
+    showError('Błąd podczas eksportu plików JSON!');
   }
 }
 
@@ -1067,7 +1094,32 @@ function deleteProject(id, showMsg = true) {
   localStorage.setItem('projects', JSON.stringify(updatedProjects));
   if(showMsg) showSuccess('✅ Projekt został usunięty!');
   loadProjects();
-  downloadProjectsFile();  // Zaktualizuj plik po usunięciu
+}
+
+function downloadFile(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+async function downloadAllDataFiles() {
+  try {
+    const projects = getProjects();
+    const scripts = getScripts();
+
+    downloadFile(new Blob([JSON.stringify(projects, null, 2)], { type: 'application/json' }), 'projects.json');
+    downloadFile(new Blob([JSON.stringify(scripts, null, 2)], { type: 'application/json' }), 'scripts.json');
+
+    showSuccess('✅ Pliki JSON zostały wygenerowane: projects.json i scripts.json');
+  } catch (error) {
+    console.error('Error exporting files:', error);
+    showError('Błąd podczas eksportu plików JSON!');
+  }
 }
 
 // Gradient z kursorem
