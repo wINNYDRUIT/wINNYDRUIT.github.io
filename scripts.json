@@ -6,5 +6,21 @@
     "desc": "[UPD] Guess the Meme or Die 🔊",
     "code": "loadstring(game:HttpGet(\"https://raw.githubusercontent.com/Finilando/script/refs/heads/main/Guess%20the%20Meme%20or%20Die\"))()",
     "date": "17.04.2026"
+  },
+  {
+    "id": "1776453053204",
+    "name": "PCD",
+    "file": "[Spring🌻] Polish Car Driving",
+    "desc": "[Spring🌻] Polish Car Driving",
+    "code": "loadstring(game:HttpGet(\"https://pastebin.com/raw/fGFcVe5V\"))() --[[imzc cracked by xonez_ / DeveloperPL / Script Tested LX63 API]]",
+    "date": "17.04.2026"
+  },
+  {
+    "id": "1776453096357",
+    "name": "One Tap",
+    "file": "..",
+    "desc": "[FPS] One Tap",
+    "code": "loadstring(game:HttpGet(\"https://rawscripts.net/raw/Universal-Script-Combat-Specialist-Pro-Universal-Script-127612\"))()",
+    "date": "17.04.2026"
   }
 ]
