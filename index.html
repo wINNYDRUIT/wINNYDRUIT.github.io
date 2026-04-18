@@ -53,28 +53,28 @@ font-family:'Inter',sans-serif;
   --bg: linear-gradient(-45deg, #040404, #0b1a2b, #10171f, #020405);
   --text: #f4feff;
   --header-bg: rgba(0,0,0,0.65);
-  --logo-gradient: linear-gradient(45deg,#006400,#32cd32);
-  --nav-color: #90ee90;
-  --nav-hover: #00ff9d;
-  --nav-hover-bg: rgba(0,100,0,0.2);
-  --hero-h1: #f7fffc;
-  --hero-p: #d4f5d4;
-  --btn-bg: #006400;
-  --btn-hover: #32cd32;
+  --logo-gradient: linear-gradient(45deg,var(--theme-logo,#ffffff),var(--theme-logo,#ffffff));
+  --nav-color: var(--theme-nav-color, #90ee90);
+  --nav-hover: var(--theme-nav-hover, #00ff9d);
+  --nav-hover-bg: var(--theme-nav-hover-bg, rgba(0,100,0,0.2));
+  --hero-h1: var(--theme-hero-h1, #f7fffc);
+  --hero-p: var(--theme-hero-p, #d4f5d4);
+  --btn-bg: var(--theme-btn-bg, #006400);
+  --btn-hover: var(--theme-btn-hover, #32cd32);
   --project-bg: rgba(0,0,0,0.55);
-  --project-border: rgba(0,100,0,0.35);
-  --project-hover-bg: rgba(0,100,0,0.15);
-  --project-hover-border: rgba(50,205,50,0.8);
+  --project-border: var(--theme-project-border, rgba(0,100,0,0.35));
+  --project-hover-bg: var(--theme-project-hover-bg, rgba(0,100,0,0.15));
+  --project-hover-border: var(--theme-project-hover-border, rgba(50,205,50,0.8));
   --project-h3: #ffffff;
-  --project-p: #f0e68c;
+  --project-p: var(--theme-project-p, #f0e68c);
   --script-card-bg: rgba(0,0,0,0.4);
-  --script-card-border: rgba(0,100,0,0.3);
+  --script-card-border: var(--theme-script-border, rgba(0,100,0,0.3));
   --script-card-hover-bg: rgba(0, 0, 0, 0.5);
-  --script-card-hover-border: rgba(50,205,50,0.8);
+  --script-card-hover-border: var(--theme-script-hover-border, rgba(50,205,50,0.8));
   --script-card-h3: #ffffff;
-  --script-card-p: #f0e68c;
+  --script-card-p: var(--theme-script-p, #f0e68c);
   --footer-bg: rgba(0, 0, 0, 0.3);
-  --footer-border: rgba(0,100,0,0.2);
+  --footer-border: var(--theme-footer-border, rgba(0,100,0,0.2));
 }
 
 .dark-mode .hero h1{
@@ -109,7 +109,7 @@ body{
 color:var(--text);
 background: var(--bg);
 background-size:400% 400%;
-transition: background-position 0.05s ease-out;
+transition: background 0.5s ease, background-position 0.05s ease-out;
 min-height: 100vh;
 }
 
@@ -368,20 +368,105 @@ position: relative;
 z-index: 2;
 }
 
-/* Animacje */
-@keyframes slideDown {
-    from { transform: translateY(-100%); opacity:0; }
-    to { transform: translateY(0); opacity:1; }
+/* Custom Color Scheme Dropdown */
+.color-scheme-container {
+  position: relative;
+  display: inline-block;
+  margin-left: 10px;
 }
 
-@keyframes fadeInUp {
-    from { transform: translateY(20px); opacity:0; }
-    to { transform: translateY(0); opacity:1; }
+.color-scheme-selected {
+  padding: 6px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--nav-color);
+  background: rgba(255,255,255,0.08);
+  color: var(--nav-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 130px;
 }
 
-@keyframes scaleIn {
-    from { transform: scale(0.7); opacity:0; }
-    to { transform: scale(1); opacity:1; }
+.color-scheme-selected:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: var(--nav-hover);
+}
+
+.color-scheme-selected::after {
+  content: '▼';
+  margin-left: 8px;
+  font-size: 12px;
+  transition: transform 0.3s ease;
+}
+
+.color-scheme-container.open .color-scheme-selected::after {
+  transform: rotate(180deg);
+}
+
+.color-scheme-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  border: 1px solid var(--nav-color);
+  margin-top: 5px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.color-scheme-container.open .color-scheme-options {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.color-scheme-option {
+  padding: 8px 12px;
+  color: var(--nav-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  margin: 2px;
+}
+
+.color-scheme-option:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.color-scheme-option.green:hover {
+  background: #006400 !important;
+  color: white;
+}
+
+.color-scheme-option.yellow:hover {
+  background: #f5c518 !important;
+  color: black;
+}
+
+.color-scheme-option.orange:hover {
+  background: #ff8c00 !important;
+  color: white;
+}
+
+.color-scheme-option.blue:hover {
+  background: #639cff !important;
+  color: white;
+}
+.color-changing {
+  animation: colorPulse 0.6s ease-out;
+}
+@keyframes colorPulse {
+  0% { filter: brightness(1) saturate(1); }
+  50% { filter: brightness(1.2) saturate(1.5); }
+  100% { filter: brightness(1) saturate(1); }
 }
 </style>
 
@@ -397,6 +482,16 @@ z-index: 2;
 <a href="#projekty" class="nav-link">Projekty</a>
 <a href="#kontakt" class="nav-link">Kontakt</a>
 <a class="btn" href="skrypty.html" style="margin-left:25px; padding:8px 14px; background:none; border:2px solid var(--nav-color); color:var(--nav-color); font-size:0.95rem; border-radius:8px;">Skrypty</a>
+<button id="theme-toggle" style="margin-left:15px; background:none; border:none; color:var(--nav-color); font-size:16px; cursor:pointer;">Dark</button>
+<div class="color-scheme-container">
+  <div class="color-scheme-selected" id="color-scheme-selected">Zielony</div>
+  <div class="color-scheme-options" id="color-scheme-options">
+    <div class="color-scheme-option green" data-value="green_dark">Zielony</div>
+    <div class="color-scheme-option yellow" data-value="yellow_dark">Żółty</div>
+    <div class="color-scheme-option orange" data-value="orange_dark">Pomarańczowy</div>
+    <div class="color-scheme-option blue" data-value="blue_dark">Niebieski</div>
+  </div>
+</div>
 </nav>
 </header>
 
@@ -426,25 +521,176 @@ z-index: 2;
 
 <script>
 (function () {
-  function applyTheme(dark) {
-    document.documentElement.classList.toggle('dark-mode', dark);
+  const themeToggle = document.getElementById('theme-toggle');
+  const colorSchemeContainer = document.querySelector('.color-scheme-container');
+  const colorSchemeSelected = document.getElementById('color-scheme-selected');
+  const colorSchemeOptions = document.getElementById('color-scheme-options');
+  const themeWipe = document.getElementById('theme-wipe');
 
-    const btn = document.getElementById('theme-toggle');
-    if (btn) btn.textContent = dark ? '☀️' : '🌙';
+  let isDropdownOpen = false;
+
+  function setTheme(dark) {
+    if (dark) {
+      document.documentElement.classList.add('dark-mode');
+      if (themeToggle) themeToggle.textContent = 'Light';
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark-mode');
+      if (themeToggle) themeToggle.textContent = 'Dark';
+      localStorage.setItem('theme', 'light');
+    }
   }
 
   function initTheme() {
-    const saved = localStorage.getItem('theme');
-    applyTheme(saved === 'dark');
+    const theme = localStorage.getItem('theme');
+    const scheme = localStorage.getItem('colorScheme') || 'green_dark';
+    setColorScheme(scheme);
+    setTheme(theme === 'dark');
   }
 
-  function toggleTheme() {
-    const isDark = document.documentElement.classList.contains('dark-mode');
-    const newTheme = !isDark;
-
-    applyTheme(newTheme);
-    localStorage.setItem('theme', newTheme ? 'dark' : 'light');
+  function applyColorSchemeValues(values) {
+    document.documentElement.style.setProperty('--theme-logo', values.logo);
+    document.documentElement.style.setProperty('--theme-nav-color', values.navColor);
+    document.documentElement.style.setProperty('--theme-nav-hover', values.navHover);
+    document.documentElement.style.setProperty('--theme-nav-hover-bg', values.navHoverBg);
+    document.documentElement.style.setProperty('--theme-hero-h1', values.heroH1);
+    document.documentElement.style.setProperty('--theme-hero-p', values.heroP);
+    document.documentElement.style.setProperty('--theme-btn-bg', values.btnBg);
+    document.documentElement.style.setProperty('--theme-btn-hover', values.btnHover);
+    document.documentElement.style.setProperty('--theme-project-border', values.projectBorder);
+    document.documentElement.style.setProperty('--theme-project-hover-bg', values.projectHoverBg);
+    document.documentElement.style.setProperty('--theme-project-hover-border', values.projectHoverBorder);
+    document.documentElement.style.setProperty('--theme-project-p', values.projectP);
+    document.documentElement.style.setProperty('--theme-script-border', values.scriptBorder);
+    document.documentElement.style.setProperty('--theme-script-hover-border', values.scriptHoverBorder);
+    document.documentElement.style.setProperty('--theme-script-p', values.scriptP);
+    document.documentElement.style.setProperty('--theme-footer-border', values.footerBorder);
   }
+
+  function getColorSchemeConfig(scheme) {
+    const schemes = {
+      green_dark: {
+        logo: '#ffffff',
+        navColor: '#90ee90',
+        navHover: '#00ff9d',
+        navHoverBg: 'rgba(0,100,0,0.2)',
+        heroH1: '#f7fffc',
+        heroP: '#d4f5d4',
+        btnBg: '#006400',
+        btnHover: '#32cd32',
+        projectBorder: 'rgba(0,100,0,0.35)',
+        projectHoverBg: 'rgba(0,100,0,0.15)',
+        projectHoverBorder: 'rgba(50,205,50,0.8)',
+        projectP: '#f0e68c',
+        scriptBorder: 'rgba(0,100,0,0.3)',
+        scriptHoverBorder: 'rgba(50,205,50,0.8)',
+        scriptP: '#f0e68c',
+        footerBorder: 'rgba(0,100,0,0.2)'
+      },
+      yellow_dark: {
+        logo: '#ffffff',
+        navColor: '#fff29a',
+        navHover: '#ffea7f',
+        navHoverBg: 'rgba(255,235,122,0.2)',
+        heroH1: '#fff7a8',
+        heroP: '#f7e7a5',
+        btnBg: '#f5c518',
+        btnHover: '#ffdd57',
+        projectBorder: 'rgba(255,235,122,0.35)',
+        projectHoverBg: 'rgba(255,235,122,0.15)',
+        projectHoverBorder: 'rgba(255,235,122,0.8)',
+        projectP: '#fff7a8',
+        scriptBorder: 'rgba(255,235,122,0.35)',
+        scriptHoverBorder: 'rgba(255,235,122,0.8)',
+        scriptP: '#fff7a8',
+        footerBorder: 'rgba(255,235,122,0.2)'
+      },
+      orange_dark: {
+        logo: '#ffffff',
+        navColor: '#ffd38c',
+        navHover: '#ffc263',
+        navHoverBg: 'rgba(255,165,0,0.2)',
+        heroH1: '#ffd68f',
+        heroP: '#f7d9b2',
+        btnBg: '#ff8c00',
+        btnHover: '#ffa500',
+        projectBorder: 'rgba(255,165,0,0.35)',
+        projectHoverBg: 'rgba(255,165,0,0.15)',
+        projectHoverBorder: 'rgba(255,165,0,0.8)',
+        projectP: '#ffe3b0',
+        scriptBorder: 'rgba(255,165,0,0.35)',
+        scriptHoverBorder: 'rgba(255,165,0,0.8)',
+        scriptP: '#ffe3b0',
+        footerBorder: 'rgba(255,165,0,0.2)'
+      },
+      blue_dark: {
+        logo: '#ffffff',
+        navColor: '#a0d8ff',
+        navHover: '#82caff',
+        navHoverBg: 'rgba(106,159,255,0.2)',
+        heroH1: '#b4d8ff',
+        heroP: '#c7e1ff',
+        btnBg: '#639cff',
+        btnHover: '#8ab8ff',
+        projectBorder: 'rgba(106,159,255,0.35)',
+        projectHoverBg: 'rgba(106,159,255,0.15)',
+        projectHoverBorder: 'rgba(106,159,255,0.8)',
+        projectP: '#c7e1ff',
+        scriptBorder: 'rgba(106,159,255,0.35)',
+        scriptHoverBorder: 'rgba(106,159,255,0.8)',
+        scriptP: '#c7e1ff',
+        footerBorder: 'rgba(106,159,255,0.2)'
+      }
+    };
+    return schemes[scheme] || schemes.green_dark;
+  }
+
+  function setColorScheme(scheme) {
+    const config = getColorSchemeConfig(scheme);
+    applyColorSchemeValues(config);
+    if (colorSchemeSelected) {
+      const optionTexts = {
+        green_dark: 'Zielony',
+        yellow_dark: 'Żółty',
+        orange_dark: 'Pomarańczowy',
+        blue_dark: 'Niebieski'
+      };
+      colorSchemeSelected.textContent = optionTexts[scheme] || 'Zielony';
+    }
+    localStorage.setItem('colorScheme', scheme);
+    
+    // Add color change animation
+    document.body.classList.add('color-changing');
+    setTimeout(() => {
+      document.body.classList.remove('color-changing');
+    }, 600);
+  }
+
+  if (colorSchemeSelected) {
+    colorSchemeSelected.addEventListener('click', function () {
+      isDropdownOpen = !isDropdownOpen;
+      colorSchemeContainer.classList.toggle('open', isDropdownOpen);
+    });
+  }
+
+  if (colorSchemeOptions) {
+    colorSchemeOptions.addEventListener('click', function (e) {
+      if (e.target.classList.contains('color-scheme-option')) {
+        const value = e.target.dataset.value;
+        setColorScheme(value);
+        isDropdownOpen = false;
+        colorSchemeContainer.classList.remove('open');
+      }
+    });
+  }
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function (e) {
+    if (!colorSchemeContainer.contains(e.target)) {
+      isDropdownOpen = false;
+      colorSchemeContainer.classList.remove('open');
+    }
+  });
 
   function initAnchors() {
     document.querySelectorAll('a.nav-link[href^="#"]').forEach(link => {
@@ -536,13 +782,28 @@ z-index: 2;
     showProjects();
   }
 
+  function toggleTheme() {
+    const isDark = document.documentElement.classList.contains('dark-mode');
+    const toDark = !isDark;
+    
+    themeWipe.classList.remove('slide-to-dark', 'slide-to-light');
+    themeWipe.classList.add(toDark ? 'slide-to-dark' : 'slide-to-light');
+
+    setTimeout(() => {
+      setTheme(toDark);
+    }, 250);
+
+    themeWipe.addEventListener('animationend', () => {
+      themeWipe.classList.remove('slide-to-dark', 'slide-to-light');
+    }, { once: true });
+  }
+
   document.addEventListener('DOMContentLoaded', async function () {
     initTheme();
     initAnchors();
 
-    const btn = document.getElementById('theme-toggle');
-    if (btn) {
-      btn.addEventListener('click', toggleTheme);
+    if (themeToggle) {
+      themeToggle.addEventListener('click', toggleTheme);
     }
 
     await renderProjects();

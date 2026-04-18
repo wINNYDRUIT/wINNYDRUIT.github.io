@@ -44,25 +44,25 @@ html{scroll-behavior:smooth;}
   --header-bg: rgba(0,0,0,0.65);
   --card-bg: rgba(0,0,0,0.55);
   --card-border: rgba(0,120,0,0.45);
-  --nav-color: #90ee90;
-  --nav-hover: #00ff9d;
-  --nav-hover-bg: rgba(0,100,0,0.2);
-  --logo-gradient: linear-gradient(45deg,#006400,#32cd32);
-  --p-color: #f0e68c;
+  --nav-color: var(--theme-nav-color, #90ee90);
+  --nav-hover: var(--theme-nav-hover, #00ff9d);
+  --nav-hover-bg: var(--theme-nav-hover-bg, rgba(0,100,0,0.2));
+  --logo-gradient: linear-gradient(45deg,var(--theme-logo,#ffffff),var(--theme-logo,#ffffff));
+  --p-color: var(--theme-text, #f0e68c);
   --pre-bg: rgba(0,0,0,0.75);
-  --pre-color: #e8e4c5;
+  --pre-color: var(--theme-pre-color, #e8e4c5);
   --script-bg: rgba(255,255,255,0.08);
-  --script-border: rgba(0,100,0,0.35);
-  --script-h2: #006400;
-  --script-p: #90ee90;
+  --script-border: var(--theme-script-border, rgba(0,100,0,0.35));
+  --script-h2: var(--theme-script-h2, #006400);
+  --script-p: var(--theme-script-p, #90ee90);
   --script-date: #bbb;
   --executor-bg: rgba(255,255,255,0.08);
-  --executor-border: rgba(0,100,0,0.35);
-  --download-btn-bg: linear-gradient(45deg,#006400,#32cd32);
-  --download-btn-shadow: rgba(0,100,0,0.5);
-  --download-btn-shadow-hover: rgba(0,100,0,0.8);
+  --executor-border: var(--theme-executor-border, rgba(0,100,0,0.35));
+  --download-btn-bg: var(--theme-download-btn-bg, linear-gradient(45deg,#006400,#32cd32));
+  --download-btn-shadow: var(--theme-download-btn-shadow, rgba(0,100,0,0.5));
+  --download-btn-shadow-hover: var(--theme-download-btn-shadow-hover, rgba(0,100,0,0.8));
 }
-body{color:var(--text);background:var(--bg);background-size:400% 400%;background-position:0% 0%;transition:background-position 0.05s ease-out;min-height:100vh;}
+body{color:var(--text);background:var(--bg);background-size:400% 400%;background-position:0% 0%;transition: background 0.5s ease, background-position 0.05s ease-out;min-height:100vh;}
 .theme-wipe {position: fixed; inset: 0; background: rgba(0,0,0,0.85); pointer-events: none; z-index: 9999; transform: translateX(-100%);}
 .theme-wipe.slide-to-dark {animation: wipe-right 0.5s ease forwards;}
 .theme-wipe.slide-to-light {animation: wipe-left 0.5s ease forwards;}
@@ -89,6 +89,106 @@ nav{background:transparent;}
 .script-item p{margin:0 0 10px;color:var(--script-p);}
 .script-item pre{background:var(--pre-bg);border-radius:8px;padding:12px;overflow:auto;color:var(--pre-color);}
 .script-item .date{font-size:0.85rem;color:var(--script-date);margin-top:8px;}
+/* Custom Color Scheme Dropdown */
+.color-scheme-container {
+  position: relative;
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.color-scheme-selected {
+  padding: 6px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--nav-color);
+  background: rgba(255,255,255,0.08);
+  color: var(--nav-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 130px;
+}
+
+.color-scheme-selected:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: var(--nav-hover);
+}
+
+.color-scheme-selected::after {
+  content: '▼';
+  margin-left: 8px;
+  font-size: 12px;
+  transition: transform 0.3s ease;
+}
+
+.color-scheme-container.open .color-scheme-selected::after {
+  transform: rotate(180deg);
+}
+
+.color-scheme-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  border: 1px solid var(--nav-color);
+  margin-top: 5px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.color-scheme-container.open .color-scheme-options {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.color-scheme-option {
+  padding: 8px 12px;
+  color: var(--nav-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  margin: 2px;
+}
+
+.color-scheme-option:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.color-scheme-option.green:hover {
+  background: #006400 !important;
+  color: white;
+}
+
+.color-scheme-option.yellow:hover {
+  background: #f5c518 !important;
+  color: black;
+}
+
+.color-scheme-option.orange:hover {
+  background: #ff8c00 !important;
+  color: white;
+}
+
+.color-scheme-option.blue:hover {
+  background: #639cff !important;
+  color: white;
+}
+.color-changing {
+  animation: colorPulse 0.6s ease-out;
+}
+@keyframes colorPulse {
+  0% { filter: brightness(1) saturate(1); }
+  50% { filter: brightness(1.2) saturate(1.5); }
+  100% { filter: brightness(1) saturate(1); }
+}
 </style>
 </head>
 <body>
@@ -97,7 +197,16 @@ nav{background:transparent;}
 <a class="logo" href="index.html">⚡ Grzesiu APPs</a>
 <nav>
 <a href="index.html">Strona Główna</a>
-<button id="theme-toggle" style="margin-left:25px; background:none; border:none; color:var(--nav-color); font-size:20px; cursor:pointer;">🌙</button>
+<button id="theme-toggle" style="margin-left:25px; background:none; border:none; color:var(--nav-color); font-size:16px; cursor:pointer;">Dark</button>
+<div class="color-scheme-container">
+  <div class="color-scheme-selected" id="color-scheme-selected">Zielony</div>
+  <div class="color-scheme-options" id="color-scheme-options">
+    <div class="color-scheme-option green" data-value="green_dark">Zielony</div>
+    <div class="color-scheme-option yellow" data-value="yellow_dark">Żółty</div>
+    <div class="color-scheme-option orange" data-value="orange_dark">Pomarańczowy</div>
+    <div class="color-scheme-option blue" data-value="blue_dark">Niebieski</div>
+  </div>
+</div>
 </nav>
 </header>
 <div class="main">
@@ -116,6 +225,187 @@ nav{background:transparent;}
 {
   "scripts": []
 }
+</script>
+<script>
+(function () {
+  const themeToggle = document.getElementById('theme-toggle');
+  const colorSchemeContainer = document.querySelector('.color-scheme-container');
+  const colorSchemeSelected = document.getElementById('color-scheme-selected');
+  const colorSchemeOptions = document.getElementById('color-scheme-options');
+  const themeWipe = document.getElementById('theme-wipe');
+
+  let isDropdownOpen = false;
+
+  function setTheme(dark) {
+    if (dark) {
+      document.documentElement.classList.add('dark-mode');
+      if (themeToggle) themeToggle.textContent = 'Light';
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark-mode');
+      if (themeToggle) themeToggle.textContent = 'Dark';
+      localStorage.setItem('theme', 'light');
+    }
+  }
+
+  function initTheme() {
+    const theme = localStorage.getItem('theme');
+    const scheme = localStorage.getItem('colorScheme') || 'green_dark';
+    setColorScheme(scheme);
+    setTheme(theme === 'dark');
+  }
+
+  function applyColorSchemeValues(values) {
+    document.documentElement.style.setProperty('--theme-logo', values.logo);
+    document.documentElement.style.setProperty('--theme-nav-color', values.navColor);
+    document.documentElement.style.setProperty('--theme-nav-hover', values.navHover);
+    document.documentElement.style.setProperty('--theme-nav-hover-bg', values.navHoverBg);
+    document.documentElement.style.setProperty('--theme-text', values.text);
+    document.documentElement.style.setProperty('--theme-pre-color', values.preColor);
+    document.documentElement.style.setProperty('--theme-script-border', values.scriptBorder);
+    document.documentElement.style.setProperty('--theme-script-h2', values.scriptH2);
+    document.documentElement.style.setProperty('--theme-script-p', values.scriptP);
+    document.documentElement.style.setProperty('--theme-executor-border', values.executorBorder);
+    document.documentElement.style.setProperty('--theme-download-btn-bg', values.downloadBtnBg);
+    document.documentElement.style.setProperty('--theme-download-btn-shadow', values.downloadBtnShadow);
+    document.documentElement.style.setProperty('--theme-download-btn-shadow-hover', values.downloadBtnShadowHover);
+  }
+
+  function getColorSchemeConfig(scheme) {
+    const schemes = {
+      green_dark: {
+        logo: '#ffffff',
+        navColor: '#90ee90',
+        navHover: '#00ff9d',
+        navHoverBg: 'rgba(0,100,0,0.2)',
+        text: '#f0e68c',
+        preColor: '#e8e4c5',
+        scriptBorder: 'rgba(0,100,0,0.35)',
+        scriptH2: '#90ee90',
+        scriptP: '#d0e8a0',
+        executorBorder: 'rgba(0,100,0,0.35)',
+        downloadBtnBg: 'linear-gradient(45deg,#006400,#32cd32)',
+        downloadBtnShadow: 'rgba(0,100,0,0.5)',
+        downloadBtnShadowHover: 'rgba(0,100,0,0.8)'
+      },
+      yellow_dark: {
+        logo: '#ffffff',
+        navColor: '#fff29a',
+        navHover: '#ffea7f',
+        navHoverBg: 'rgba(255,235,122,0.2)',
+        text: '#fff7a8',
+        preColor: '#f8f1c0',
+        scriptBorder: 'rgba(255,235,122,0.35)',
+        scriptH2: '#fff7a8',
+        scriptP: '#fff2b5',
+        executorBorder: 'rgba(255,235,122,0.35)',
+        downloadBtnBg: 'linear-gradient(45deg,#f5c518,#ffdd57)',
+        downloadBtnShadow: 'rgba(255,235,122,0.5)',
+        downloadBtnShadowHover: 'rgba(255,235,122,0.8)'
+      },
+      orange_dark: {
+        logo: '#ffffff',
+        navColor: '#ffd38c',
+        navHover: '#ffc263',
+        navHoverBg: 'rgba(255,165,0,0.2)',
+        text: '#ffe3b0',
+        preColor: '#ffecd2',
+        scriptBorder: 'rgba(255,165,0,0.35)',
+        scriptH2: '#ffd38c',
+        scriptP: '#ffe5c3',
+        executorBorder: 'rgba(255,165,0,0.35)',
+        downloadBtnBg: 'linear-gradient(45deg,#ff8c00,#ffa500)',
+        downloadBtnShadow: 'rgba(255,165,0,0.5)',
+        downloadBtnShadowHover: 'rgba(255,165,0,0.8)'
+      },
+      blue_dark: {
+        logo: '#ffffff',
+        navColor: '#a0d8ff',
+        navHover: '#82caff',
+        navHoverBg: 'rgba(106,159,255,0.2)',
+        text: '#c7e1ff',
+        preColor: '#d9e8ff',
+        scriptBorder: 'rgba(106,159,255,0.35)',
+        scriptH2: '#b4d8ff',
+        scriptP: '#d3e6ff',
+        executorBorder: 'rgba(106,159,255,0.35)',
+        downloadBtnBg: 'linear-gradient(45deg,#639cff,#8ab8ff)',
+        downloadBtnShadow: 'rgba(106,159,255,0.5)',
+        downloadBtnShadowHover: 'rgba(106,159,255,0.8)'
+      }
+    };
+    return schemes[scheme] || schemes.green_dark;
+  }
+
+  function setColorScheme(scheme) {
+    const config = getColorSchemeConfig(scheme);
+    applyColorSchemeValues(config);
+    if (colorSchemeSelected) {
+      const optionTexts = {
+        green_dark: 'Zielony',
+        yellow_dark: 'Żółty',
+        orange_dark: 'Pomarańczowy',
+        blue_dark: 'Niebieski'
+      };
+      colorSchemeSelected.textContent = optionTexts[scheme] || 'Zielony';
+    }
+    localStorage.setItem('colorScheme', scheme);
+    
+    // Add color change animation
+    document.body.classList.add('color-changing');
+    setTimeout(() => {
+      document.body.classList.remove('color-changing');
+    }, 600);
+  }
+
+  if (colorSchemeSelected) {
+    colorSchemeSelected.addEventListener('click', function () {
+      isDropdownOpen = !isDropdownOpen;
+      colorSchemeContainer.classList.toggle('open', isDropdownOpen);
+    });
+  }
+
+  if (colorSchemeOptions) {
+    colorSchemeOptions.addEventListener('click', function (e) {
+      if (e.target.classList.contains('color-scheme-option')) {
+        const value = e.target.dataset.value;
+        setColorScheme(value);
+        isDropdownOpen = false;
+        colorSchemeContainer.classList.remove('open');
+      }
+    });
+  }
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function (e) {
+    if (!colorSchemeContainer.contains(e.target)) {
+      isDropdownOpen = false;
+      colorSchemeContainer.classList.remove('open');
+    }
+  });
+
+  function toggleTheme() {
+    const isDark = document.documentElement.classList.contains('dark-mode');
+    const toDark = !isDark;
+    
+    themeWipe.classList.remove('slide-to-dark', 'slide-to-light');
+    themeWipe.classList.add(toDark ? 'slide-to-dark' : 'slide-to-light');
+
+    setTimeout(() => {
+      setTheme(toDark);
+    }, 250);
+
+    themeWipe.addEventListener('animationend', () => {
+      themeWipe.classList.remove('slide-to-dark', 'slide-to-light');
+    }, { once: true });
+  }
+
+  if (themeToggle) {
+    themeToggle.addEventListener('click', toggleTheme);
+  }
+
+  initTheme();
+})();
 </script>
 <script>
 async function fetchJsonFile(url) {
@@ -204,42 +494,6 @@ function showScripts() {
     }
   });
 }
-
-const themeToggle = document.getElementById('theme-toggle');
-const themeWipe = document.getElementById('theme-wipe');
-
-function setTheme(dark) {
-  if (dark) {
-    document.body.classList.add('dark-mode');
-    themeToggle.textContent = '☀️';
-    localStorage.setItem('theme', 'dark');
-  } else {
-    document.body.classList.remove('dark-mode');
-    themeToggle.textContent = '🌙';
-    localStorage.setItem('theme', 'light');
-  }
-}
-
-function initTheme() {
-  const theme = localStorage.getItem('theme');
-  setTheme(theme === 'dark');
-}
-
-themeToggle.addEventListener('click', () => {
-  const toDark = !document.body.classList.contains('dark-mode');
-  themeWipe.classList.remove('slide-to-dark', 'slide-to-light');
-  themeWipe.classList.add(toDark ? 'slide-to-dark' : 'slide-to-light');
-
-  setTimeout(() => {
-    setTheme(toDark);
-  }, 250);
-
-  themeWipe.addEventListener('animationend', () => {
-    themeWipe.classList.remove('slide-to-dark', 'slide-to-light');
-  }, { once: true });
-});
-
-document.addEventListener('DOMContentLoaded', initTheme);
 </script>
 </body>
 </html>

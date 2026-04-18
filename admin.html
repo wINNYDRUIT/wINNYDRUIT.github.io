@@ -74,45 +74,45 @@ font-family:'Inter',sans-serif;
   --bg: linear-gradient(-45deg, #040404, #0b1a2b, #10171f, #020405);
   --text: #e8f3ff;
   --header-bg: rgba(0, 0, 0, 0.65);
-  --logo-admin: #32cd32;
+  --logo-admin: var(--theme-logo);
   --logout-bg: #b30000;
   --logout-hover: #ff4444;
   --login-bg: rgba(0, 0, 0, 0.7);
-  --login-border: rgba(0, 120, 0, 0.8);
-  --login-h2: #32cd32;
-  --form-label: #90ee90;
-  --form-input-bg: rgba(0,100,0,0.1);
-  --form-input-border: rgba(0,100,0,0.3);
-  --form-input-focus-bg: rgba(0,100,0,0.2);
-  --form-input-focus-border: rgba(0,100,0,0.8);
-  --login-btn-bg: #006400;
-  --login-btn-hover: #32cd32;
+  --login-border: var(--theme-border);
+  --login-h2: var(--theme-heading);
+  --form-label: var(--theme-text);
+  --form-input-bg: var(--theme-input-bg);
+  --form-input-border: var(--theme-border);
+  --form-input-focus-bg: var(--theme-input-focus-bg);
+  --form-input-focus-border: var(--theme-input-focus-border);
+  --login-btn-bg: var(--theme-button-bg);
+  --login-btn-hover: var(--theme-button-hover);
   --error-bg: rgba(255, 0, 0, 0.2);
   --error-border: rgba(255, 0, 0, 0.5);
   --error-color: #ff6b6b;
-  --section-title: #006400;
+  --section-title: var(--theme-heading);
   --add-project-bg: rgba(0, 0, 0, 0.4);
-  --add-project-border: rgba(0,100,0,0.3);
-  --form-admin-label: #90ee90;
-  --form-admin-input-bg: rgba(0,100,0,0.1);
-  --form-admin-input-border: rgba(0,100,0,0.3);
-  --form-admin-input-focus-bg: rgba(0,100,0,0.2);
-  --form-admin-input-focus-border: rgba(0,100,0,0.8);
-  --add-btn-bg: #4CAF50;
-  --add-btn-hover: #45a049;
+  --add-project-border: var(--theme-border);
+  --form-admin-label: var(--theme-text);
+  --form-admin-input-bg: var(--theme-input-bg);
+  --form-admin-input-border: var(--theme-border);
+  --form-admin-input-focus-bg: var(--theme-input-focus-bg);
+  --form-admin-input-focus-border: var(--theme-input-focus-border);
+  --add-btn-bg: var(--theme-button-bg);
+  --add-btn-hover: var(--theme-button-hover);
   --project-item-bg: rgba(0, 0, 0, 0.4);
-  --project-item-border: rgba(0,100,0,0.3);
-  --project-item-hover-border: rgba(50,205,50,0.8);
-  --project-item-h4: #006400;
-  --project-item-p: #90ee90;
+  --project-item-border: var(--theme-border);
+  --project-item-hover-border: var(--theme-hover-border);
+  --project-item-h4: var(--theme-heading);
+  --project-item-p: var(--theme-text);
   --edit-btn-bg: #2196F3;
   --edit-btn-hover: #0b7dda;
   --delete-btn-bg: #d32f2f;
   --delete-btn-hover: #ff4444;
-  --empty-state: #90ee90;
-  --success-bg: rgba(76, 175, 80, 0.2);
-  --success-border: rgba(76, 175, 80, 0.5);
-  --success-color: #90EE90;
+  --empty-state: var(--theme-text);
+  --success-bg: var(--theme-success-bg);
+  --success-border: var(--theme-success-border);
+  --success-color: var(--theme-success-color);
 }
 
 body{
@@ -576,7 +576,13 @@ Demo: login: <strong>admin</strong> | hasło: <strong>admin123</strong>
 <a class="logo-admin" href="index.html">⚡ Admin Panel - Grzesiu APPs</a>
 <div>
 <button class="logout-btn" onclick="logout()">Wyloguj się</button>
-<button id="theme-toggle" style="margin-left:10px; background:none; border:none; color:var(--form-label); font-size:20px; cursor:pointer;">🌙</button>
+<button id="theme-toggle" style="margin-left:10px; background:none; border:none; color:var(--form-label); font-size:16px; cursor:pointer;">Dark</button>
+<select id="color-scheme" style="margin-left:10px; padding:6px 10px; border-radius:8px; border:1px solid var(--form-input-border); background: rgba(255,255,255,0.08); color: var(--form-label);">
+  <option value="green_dark">Zielony</option>
+  <option value="yellow_dark">Żółty</option>
+  <option value="orange_dark">Pomarańczowy</option>
+  <option value="blue_dark">Niebieski</option>
+</select>
 </div>
 </header>
 
@@ -1131,21 +1137,113 @@ document.addEventListener('mousemove', e => {
 
 const themeToggle = document.getElementById('theme-toggle');
 const themeWipe = document.getElementById('theme-wipe');
+const colorSchemeSelect = document.getElementById('color-scheme');
+
+function applyColorSchemeValues(values) {
+  document.documentElement.style.setProperty('--theme-logo', values.logo);
+  document.documentElement.style.setProperty('--theme-border', values.border);
+  document.documentElement.style.setProperty('--theme-hover-border', values.hoverBorder);
+  document.documentElement.style.setProperty('--theme-heading', values.heading);
+  document.documentElement.style.setProperty('--theme-text', values.text);
+  document.documentElement.style.setProperty('--theme-input-bg', values.inputBg);
+  document.documentElement.style.setProperty('--theme-input-focus-bg', values.inputFocusBg);
+  document.documentElement.style.setProperty('--theme-input-focus-border', values.inputFocusBorder);
+  document.documentElement.style.setProperty('--theme-button-bg', values.buttonBg);
+  document.documentElement.style.setProperty('--theme-button-hover', values.buttonHover);
+  document.documentElement.style.setProperty('--theme-success-bg', values.successBg);
+  document.documentElement.style.setProperty('--theme-success-border', values.successBorder);
+  document.documentElement.style.setProperty('--theme-success-color', values.successColor);
+}
+
+function getColorSchemeConfig(scheme) {
+  const schemes = {
+    green_dark: {
+      logo: '#ffffff',
+      border: 'rgba(144,238,144,0.3)',
+      hoverBorder: 'rgba(144,238,144,0.55)',
+      heading: '#ffffff',
+      text: '#ffffff',
+      inputBg: 'rgba(255,255,255,0.1)',
+      inputFocusBg: 'rgba(255,255,255,0.15)',
+      inputFocusBorder: 'rgba(255,255,255,0.35)',
+      buttonBg: '#ffffff',
+      buttonHover: '#f2f2f2',
+      successBg: 'rgba(255,255,255,0.15)',
+      successBorder: 'rgba(255,255,255,0.35)',
+      successColor: '#ffffff'
+    },
+    yellow_dark: {
+      logo: '#ffffff',
+      border: 'rgba(255,235,122,0.3)',
+      hoverBorder: 'rgba(255,235,122,0.55)',
+      heading: '#fff7a8',
+      text: '#ffffff',
+      inputBg: 'rgba(255,255,255,0.1)',
+      inputFocusBg: 'rgba(255,255,255,0.15)',
+      inputFocusBorder: 'rgba(255,255,255,0.35)',
+      buttonBg: '#ffffff',
+      buttonHover: '#f8f4d1',
+      successBg: 'rgba(255,235,122,0.18)',
+      successBorder: 'rgba(255,235,122,0.35)',
+      successColor: '#fff7a8'
+    },
+    orange_dark: {
+      logo: '#ffffff',
+      border: 'rgba(255,165,0,0.3)',
+      hoverBorder: 'rgba(255,165,0,0.55)',
+      heading: '#ffd27f',
+      text: '#ffffff',
+      inputBg: 'rgba(255,255,255,0.1)',
+      inputFocusBg: 'rgba(255,255,255,0.15)',
+      inputFocusBorder: 'rgba(255,255,255,0.35)',
+      buttonBg: '#ffffff',
+      buttonHover: '#ffebcd',
+      successBg: 'rgba(255,165,0,0.18)',
+      successBorder: 'rgba(255,165,0,0.35)',
+      successColor: '#ffd27f'
+    },
+    blue_dark: {
+      logo: '#ffffff',
+      border: 'rgba(106, 159, 255, 0.3)',
+      hoverBorder: 'rgba(106, 159, 255, 0.55)',
+      heading: '#b4d8ff',
+      text: '#ffffff',
+      inputBg: 'rgba(255,255,255,0.1)',
+      inputFocusBg: 'rgba(255,255,255,0.15)',
+      inputFocusBorder: 'rgba(255,255,255,0.35)',
+      buttonBg: '#ffffff',
+      buttonHover: '#dce8ff',
+      successBg: 'rgba(106, 159, 255, 0.18)',
+      successBorder: 'rgba(106, 159, 255, 0.35)',
+      successColor: '#b4d8ff'
+    }
+  };
+  return schemes[scheme] || schemes.green_dark;
+}
+
+function setColorScheme(scheme) {
+  const config = getColorSchemeConfig(scheme);
+  applyColorSchemeValues(config);
+  localStorage.setItem('colorScheme', scheme);
+  if (colorSchemeSelect) colorSchemeSelect.value = scheme;
+}
 
 function setTheme(dark) {
   if (dark) {
     document.body.classList.add('dark-mode');
-    themeToggle.textContent = '☀️';
+    themeToggle.textContent = 'Light';
     localStorage.setItem('theme', 'dark');
   } else {
     document.body.classList.remove('dark-mode');
-    themeToggle.textContent = '🌙';
+    themeToggle.textContent = 'Dark';
     localStorage.setItem('theme', 'light');
   }
 }
 
 function initTheme() {
   const theme = localStorage.getItem('theme');
+  const scheme = localStorage.getItem('colorScheme') || 'green_dark';
+  setColorScheme(scheme);
   setTheme(theme === 'dark');
 }
 
@@ -1162,6 +1260,12 @@ themeToggle.addEventListener('click', () => {
     themeWipe.classList.remove('slide-to-dark', 'slide-to-light');
   }, { once: true });
 });
+
+if (colorSchemeSelect) {
+  colorSchemeSelect.addEventListener('change', function() {
+    setColorScheme(this.value);
+  });
+}
 
 document.addEventListener('DOMContentLoaded', initTheme);
 
